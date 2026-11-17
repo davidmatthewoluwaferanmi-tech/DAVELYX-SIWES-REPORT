@@ -6,17 +6,13 @@
     if (saved > 0) visitorCount.textContent = `${saved.toLocaleString()} visits`;
   } catch (_) {}
   fetch('https://api.countapi.xyz/hit/davelyx-siwes-plug/visits')
-    .then((response) => {
-      if (!response.ok) throw new Error('Count service unavailable');
-      return response.json();
-    })
+    .then((response) => { if (!response.ok) throw new Error('Count service unavailable'); return response.json(); })
     .then((data) => {
       if (Number.isFinite(Number(data.value))) {
         visitorCount.textContent = `${Number(data.value).toLocaleString()} visits`;
         try { localStorage.setItem('davelyxVisitorCount', String(data.value)); } catch (_) {}
       }
-    })
-    .catch(() => {});
+    }).catch(() => {});
 
   const orderForm = document.getElementById('order-form');
   const formStatus = document.getElementById('form-status');
@@ -36,8 +32,7 @@
   const validOrder = () => {
     if (!orderForm.reportValidity()) return null;
     const details = orderDetails();
-    const digits = details.whatsapp.replace(/\D/g, '');
-    if (digits.length < 10) {
+    if (details.whatsapp.replace(/\D/g, '').length < 10) {
       document.getElementById('whatsapp-number').setCustomValidity('Enter a complete WhatsApp number.');
       orderForm.reportValidity();
       return null;
@@ -68,7 +63,12 @@
 
   window.Tawk_API = window.Tawk_API || {};
   window.Tawk_LoadStart = new Date();
-  window.Tawk_API.customStyle = { visibility: { desktop: { position: 'tl', xOffset: '20px', yOffset: '20px' }, mobile: { position: 'tl', xOffset: '12px', yOffset: '12px' } } };
+  window.Tawk_API.customStyle = {
+    visibility: {
+      desktop: { position: 'bl', xOffset: '20px', yOffset: '20px' },
+      mobile: { position: 'bl', xOffset: '12px', yOffset: '12px' }
+    }
+  };
   const tawkScript = document.createElement('script');
   tawkScript.async = true;
   tawkScript.src = 'https://embed.tawk.to/6afbb430c812c53cc041b184/1k7jjfo2t';

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0D221B" />
+  <title>Payment received | DAVELYX SIWES PLUG</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    body{min-height:100vh;display:grid;place-items:center;padding:24px}
+    .thank-you-card{width:min(100%,620px);padding:clamp(24px,6vw,48px);border:1px solid var(--gold);border-radius:24px;background:var(--green);color:#fff;box-shadow:var(--shadow)}
+    .thank-you-card h1{margin:0 0 12px;color:var(--gold);font-family:'Playfair Display',serif}
+    .thank-you-card p{color:#d4dfd8;line-height:1.7}
+    .order-summary{margin:24px 0;padding:18px;border-radius:14px;background:#132d24}
+    .order-summary p{margin:7px 0}
+    .thank-you-actions{display:grid;gap:12px;margin-top:24px}
+    .thank-you-actions .btn{width:100%}
+  </style>
+</head>
+<body>
+  <main class="thank-you-card">
+    <span class="eyebrow">DAVELYX SIWES PLUG</span>
+    <h1>Payment Received! 🎉</h1>
+    <p>Thank you. We will confirm your payment on WhatsApp within 10 mins.</p>
+    <section class="order-summary" aria-live="polite">
+      <h2>Order summary</h2>
+      <div id="order-summary-content">Loading your saved order…</div>
+    </section>
+    <p id="confirmation-status" role="status" aria-live="polite"></p>
+    <div class="thank-you-actions">
+      <a class="btn btn-gold" id="whatsapp-confirmation" href="https://wa.me/2349035589937" target="_blank" rel="noopener noreferrer">Confirm on WhatsApp</a>
+      <a class="btn btn-outline" href="index.html">Back to Home</a>
+    </div>
+  </main>
+  <script>
+    (function () {
+      const summary = document.getElementById('order-summary-content');
+      const status = document.getElementById('confirmation-status');
+      const whatsappButton = document.getElementById('whatsapp-confirmation');
+      let order;
+      try { order = JSON.parse(localStorage.getItem('davelyx_last_order') || 'null'); } catch (_) {}
+      if (!order) {
+        summary.textContent = 'We could not find a saved order in this browser. You can still message us on WhatsApp.';
+        status.textContent = 'Please include your name and selected package in your WhatsApp message.';
+        return;
+      }
+      const rows = [
+        ['Name', order.name], ['Department', order.department], ['School', order.institution],
+        ['Company', order.company], ['Location', order.location], ['Duration', order.duration],
+        ['WhatsApp', order.whatsapp], ['Package', order.package]
+      ];
+      rows.forEach(([label, value]) => {
+        const row = document.createElement('p');
+        const strong = document.createElement('strong');
+        strong.textContent = `${label}: `;
+        row.append(strong, document.createTextNode(value || '—'));
+        summary.appendChild(row);
+      });
+      const message = `Hello DAVELYX! I just paid for ${order.package} via Selar. My details: Name: ${order.name}, Dept: ${order.department}, School: ${order.institution}, Company: ${order.company}, Location: ${order.location}, Duration: ${order.duration}, WhatsApp: ${order.whatsapp}. Please confirm.`;
+      const whatsappUrl = `https://wa.me/2349035589937?text=${encodeURIComponent(message)}`;
+      whatsappButton.href = whatsappUrl;
+      status.textContent = 'Opening WhatsApp to send your confirmation…';
+      const popup = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      if (!popup) status.textContent = 'If WhatsApp did not open, use the Confirm on WhatsApp button above.';
+    })();
+  </script>
+</body>
+</html>
