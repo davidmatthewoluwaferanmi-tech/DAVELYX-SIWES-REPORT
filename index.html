@@ -54,8 +54,10 @@
     .hero::before { width: 420px; height: 420px; right: -130px; top: -210px; border: 1px solid rgba(232, 240, 229, 0.18); box-shadow: 0 0 0 42px rgba(232, 240, 229, .045), 0 0 0 88px rgba(232, 240, 229, .03); }
     .hero::after { width: 200px; height: 200px; left: 52%; bottom: -110px; border: 1px solid rgba(255, 201, 71, .3); box-shadow: 0 0 0 30px rgba(255, 201, 71, .06); }
     .hero-content, .hero-aside { position: relative; z-index: 1; }
+    .hero-pills { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
     .pill { display: inline-flex; align-items: center; gap: 9px; padding: 10px 15px; border-radius: 999px; background: var(--sage); color: var(--forest-deep); font-size: 11px; font-weight: 800; }
     .pill-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--forest-bright); }
+    .visitor-pill { min-height: 34px; padding: 7px 11px; font-size: 10px; font-weight: 700; white-space: nowrap; }
     h1 { max-width: 690px; margin: 24px 0 18px; font-size: clamp(42px, 6vw, 69px); line-height: 1.04; letter-spacing: -.07em; }
     .hero-copy { max-width: 545px; margin: 0; color: var(--sage); font-size: 15px; line-height: 1.85; }
     .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
@@ -205,7 +207,10 @@
     <section class="hero-wrap" id="home">
       <div class="hero container reveal">
         <div class="hero-content">
-          <span class="pill"><span class="pill-dot" aria-hidden="true"></span> Trusted by 1000+ Students</span>
+          <div class="hero-pills">
+            <span class="pill"><span class="pill-dot" aria-hidden="true"></span> Trusted by 1000+ Students</span>
+            <span class="pill visitor-pill" aria-live="polite" aria-label="Page visit count">👁️ <span id="visitor-count">Visits</span></span>
+          </div>
           <h1>Your SIWES report, handled with care.</h1>
           <p class="hero-copy">Get clear, organized report and logbook support shaped around your course, your experience and your school requirements.</p>
           <div class="hero-actions">
@@ -239,11 +244,7 @@
             <span class="service-icon" aria-hidden="true">▤</span>
             <h3>Complete Report</h3>
             <p>Chapter 1–5 support tailored to your course and industrial training experience.</p>
-            <ul class="feature-list">
-              <li>Course-focused report structure</li>
-              <li>Clear, organized chapters</li>
-              <li>Personal WhatsApp guidance</li>
-            </ul>
+            <ul class="feature-list"><li>Course-focused report structure</li><li>Clear, organized chapters</li><li>Personal WhatsApp guidance</li></ul>
             <div class="price"><span class="price-label">ONE-TIME PRICE</span><strong>₦8,000</strong></div>
             <a class="button button-dark" href="https://wa.me/2349035589937?text=Hello%20DAVELYX%2C%20I%20need%20SIWES%20Report%20for%20[My%20Dept%20and%20School]" target="_blank" rel="noopener noreferrer">Request a report <span aria-hidden="true">↗</span></a>
           </article>
@@ -251,24 +252,15 @@
             <span class="service-icon" aria-hidden="true">▦</span>
             <h3>Logbook Support</h3>
             <p>Get help structuring and organizing your daily or weekly industrial training activities.</p>
-            <ul class="feature-list">
-              <li>Daily or weekly entries</li>
-              <li>Organized training activities</li>
-              <li>Personal WhatsApp guidance</li>
-            </ul>
+            <ul class="feature-list"><li>Daily or weekly entries</li><li>Organized training activities</li><li>Personal WhatsApp guidance</li></ul>
             <div class="price"><span class="price-label">ONE-TIME PRICE</span><strong>₦3,000</strong></div>
             <a class="button button-dark" href="https://wa.me/2349035589937?text=Hello%20DAVELYX%2C%20I%20need%20SIWES%20Report%20for%20[My%20Dept%20and%20School]" target="_blank" rel="noopener noreferrer">Request logbook help <span aria-hidden="true">↗</span></a>
           </article>
           <article class="service-card best-value">
-            <span class="service-icon" aria-hidden="true">✦</span>
-            <span class="best-tag">Best value</span>
+            <span class="service-icon" aria-hidden="true">✦</span><span class="best-tag">Best value</span>
             <h3>Both</h3>
             <p>Bring report and logbook support together in one convenient package.</p>
-            <ul class="feature-list">
-              <li>Complete report support</li>
-              <li>Logbook organization</li>
-              <li>One convenient package</li>
-            </ul>
+            <ul class="feature-list"><li>Complete report support</li><li>Logbook organization</li><li>One convenient package</li></ul>
             <div class="price"><span class="price-label">PACKAGE PRICE</span><strong>₦10,000</strong></div>
             <a class="button button-dark" href="https://wa.me/2349035589937?text=Hello%20DAVELYX%2C%20I%20need%20SIWES%20Report%20for%20[My%20Dept%20and%20School]" target="_blank" rel="noopener noreferrer">Choose the package <span aria-hidden="true">↗</span></a>
           </article>
@@ -279,9 +271,7 @@
     <section class="section" id="showcase">
       <div class="container showcase reveal">
         <div class="showcase-card">
-          <span class="eyebrow">Student experiences</span>
-          <h3>Support students can count on.</h3>
-          <p>Friendly guidance and dependable communication for students across campuses.</p>
+          <span class="eyebrow">Student experiences</span><h3>Support students can count on.</h3><p>Friendly guidance and dependable communication for students across campuses.</p>
           <div class="reviews">
             <article class="review"><div class="stars" aria-label="5 out of 5 stars">★★★★★</div><h3>FUTA</h3><p>“Clear, practical support and easy WhatsApp communication.”</p><span class="campus">FUTA</span></article>
             <article class="review"><div class="stars" aria-label="5 out of 5 stars">★★★★★</div><h3>UNILAG</h3><p>“Everything felt organized and straightforward from the start.”</p><span class="campus">UNILAG</span></article>
@@ -289,86 +279,28 @@
           </div>
         </div>
         <div class="showcase-card">
-          <span class="eyebrow">A look at the format</span>
-          <h3>Sample report preview</h3>
-          <p>Every report is planned around the details you provide, from your course to your training experience.</p>
-          <div class="preview" aria-label="Blurred sample report pages">
-            <div class="paper-stack">
-              <div class="paper back">
-                <div class="paper-title">INDUSTRIAL TRAINING REPORT</div>
-                <div class="paper-line"></div>
-                <div class="paper-line short"></div>
-                <div class="paper-line"></div>
-                <div class="paper-line"></div>
-                <div class="paper-title">CHAPTER ONE</div>
-                <div class="paper-line"></div>
-                <div class="paper-line short"></div>
-              </div>
-              <div class="paper front">
-                <div class="paper-title">STUDENT SIWES REPORT</div>
-                <div class="paper-line"></div>
-                <div class="paper-line short"></div>
-                <div class="paper-line"></div>
-                <div class="paper-title">TRAINING OVERVIEW</div>
-                <div class="paper-line"></div>
-                <div class="paper-line"></div>
-                <div class="paper-line short"></div>
-              </div>
-            </div>
-            <div class="preview-overlay"><div class="preview-badge">Sample pages<br />Details blurred for privacy</div></div>
-          </div>
+          <span class="eyebrow">A look at the format</span><h3>Sample report preview</h3><p>Every report is planned around the details you provide, from your course to your training experience.</p>
+          <div class="preview" aria-label="Blurred sample report pages"><div class="paper-stack"><div class="paper back"><div class="paper-title">INDUSTRIAL TRAINING REPORT</div><div class="paper-line"></div><div class="paper-line short"></div><div class="paper-line"></div><div class="paper-line"></div><div class="paper-title">CHAPTER ONE</div><div class="paper-line"></div><div class="paper-line short"></div></div><div class="paper front"><div class="paper-title">STUDENT SIWES REPORT</div><div class="paper-line"></div><div class="paper-line short"></div><div class="paper-line"></div><div class="paper-title">TRAINING OVERVIEW</div><div class="paper-line"></div><div class="paper-line"></div><div class="paper-line short"></div></div></div><div class="preview-overlay"><div class="preview-badge">Sample pages<br />Details blurred for privacy</div></div></div>
         </div>
       </div>
     </section>
 
-    <section class="payment-section" id="payment">
-      <div class="container payment-card reveal">
-        <div>
-          <span class="eyebrow">Simple bank transfer</span>
-          <h2>Payment, made straightforward.</h2>
-          <p class="payment-copy">Confirm your service with us. Transfer to the OPay account below, then send proof of payment on WhatsApp so we can proceed.</p>
-          <a class="button button-white" href="https://wa.me/2349035589937?text=Hello%20DAVELYX%2C%20I%20need%20SIWES%20Report%20for%20[My%20Dept%20and%20School]" target="_blank" rel="noopener noreferrer">Chat with DAVELYX <span aria-hidden="true">↗</span></a>
-        </div>
-        <div class="bank-details">
-          <h3>OPay transfer details</h3>
-          <dl>
-            <div class="detail-row"><dt>Bank</dt><dd>OPay</dd></div>
-            <div class="detail-row"><dt>Account number</dt><dd class="account-row"><span id="account-number">9035589937</span><button class="copy-button" id="copy-account" type="button" aria-label="Copy OPay account number">Copy</button></dd></div>
-            <div class="detail-row"><dt>Account name</dt><dd>David Matthew Oluwaferanmi</dd></div>
-          </dl>
-          <p id="copy-status" class="copy-status" role="status" aria-live="polite"></p>
-          <a class="button button-white payment-cta" href="https://wa.me/2349035589937?text=Hello%20DAVELYX%2C%20I%20need%20SIWES%20Report%20for%20[My%20Dept%20and%20School]" target="_blank" rel="noopener noreferrer">Send proof on WhatsApp <span aria-hidden="true">↗</span></a>
-        </div>
-      </div>
-    </section>
+    <section class="payment-section" id="payment"><div class="container payment-card reveal">
+      <div><span class="eyebrow">Simple bank transfer</span><h2>Payment, made straightforward.</h2><p class="payment-copy">Confirm your service with us. Transfer to the OPay account below, then send proof of payment on WhatsApp so we can proceed.</p><a class="button button-white" href="https://wa.me/2349035589937?text=Hello%20DAVELYX%2C%20I%20need%20SIWES%20Report%20for%20[My%20Dept%20and%20School]" target="_blank" rel="noopener noreferrer">Chat with DAVELYX <span aria-hidden="true">↗</span></a></div>
+      <div class="bank-details"><h3>OPay transfer details</h3><dl><div class="detail-row"><dt>Bank</dt><dd>OPay</dd></div><div class="detail-row"><dt>Account number</dt><dd class="account-row"><span id="account-number">9035589937</span><button class="copy-button" id="copy-account" type="button" aria-label="Copy OPay account number">Copy</button></dd></div><div class="detail-row"><dt>Account name</dt><dd>David Matthew Oluwaferanmi</dd></div></dl><p id="copy-status" class="copy-status" role="status" aria-live="polite"></p><a class="button button-white payment-cta" href="https://wa.me/2349035589937?text=Hello%20DAVELYX%2C%20I%20need%20SIWES%20Report%20for%20[My%20Dept%20and%20School]" target="_blank" rel="noopener noreferrer">Send proof on WhatsApp <span aria-hidden="true">↗</span></a></div>
+    </div></section>
 
-    <section class="section" id="faq">
-      <div class="container reveal"><header class="section-heading"><span class="eyebrow">Good to know</span><h2>Frequently asked questions</h2><p>Have another question? Reach us on WhatsApp and we’ll be happy to help.</p></header><div class="faq-list">
-        <details>
-          <summary>What do I need to get started?</summary>
-          <p>Send your department, school, service needed and deadline via WhatsApp. We’ll guide you through any other details required.</p>
-        </details>
-        <details>
-          <summary>How do I make payment?</summary>
-          <p>Confirm your service with us first, then transfer to the OPay account listed above. Share your proof of payment with us on WhatsApp.</p>
-        </details>
-        <details>
-          <summary>How soon will I receive support?</summary>
-          <p>Timing depends on your requirements and deadline. Message us with your details so we can discuss a suitable timeline before you proceed.</p>
-        </details>
-        <details>
-          <summary>Can I request changes?</summary>
-          <p>Tell us about any corrections or adjustments you need, along with your school’s requirements, and we’ll discuss the next steps with you.</p>
-        </details>
-      </div></div>
-    </section>
+    <section class="section" id="faq"><div class="container reveal"><header class="section-heading"><span class="eyebrow">Good to know</span><h2>Frequently asked questions</h2><p>Have another question? Reach us on WhatsApp and we’ll be happy to help.</p></header><div class="faq-list">
+      <details><summary>What do I need to get started?</summary><p>Send your department, school, service needed and deadline via WhatsApp. We’ll guide you through any other details required.</p></details>
+      <details><summary>How do I make payment?</summary><p>Confirm your service with us first, then transfer to the OPay account listed above. Share your proof of payment with us on WhatsApp.</p></details>
+      <details><summary>How soon will I receive support?</summary><p>Timing depends on your requirements and deadline. Message us with your details so we can discuss a suitable timeline before you proceed.</p></details>
+      <details><summary>Can I request changes?</summary><p>Tell us about any corrections or adjustments you need, along with your school’s requirements, and we’ll discuss the next steps with you.</p></details>
+    </div></div></section>
 
     <section class="final-cta reveal"><h2>Ready to make SIWES simpler?</h2><p>Tell us your department and school, and the support you need. We’re one WhatsApp message away.</p><a class="button button-dark" href="https://wa.me/2349035589937?text=Hello%20DAVELYX%2C%20I%20need%20SIWES%20Report%20for%20[My%20Dept%20and%20School]" target="_blank" rel="noopener noreferrer">Message DAVELYX <span aria-hidden="true">↗</span></a></section>
   </main>
 
-  <footer class="footer">
-    <div class="container"><div class="footer-main"><div><a class="brand" href="#home"><span class="brand-mark" aria-hidden="true">D</span><span>DAVELYX<small>SIWES PLUG</small></span></a><p class="footer-description">SIWES report and logbook support for Nigerian students.</p></div><div class="footer-links"><a href="#services">Services</a><a href="#faq">FAQ</a><a href="https://www.facebook.com/share/1ACfi9keN3/" target="_blank" rel="noopener noreferrer">Facebook ↗</a><a href="https://wa.me/2349035589937?text=Hello%20DAVELYX%2C%20I%20need%20SIWES%20Report%20for%20[My%20Dept%20and%20School]" target="_blank" rel="noopener noreferrer">WhatsApp ↗</a></div></div><div class="copyright">© <span id="year"></span> DAVELYX SIWES PLUG. All rights reserved.</div></div>
-  </footer>
+  <footer class="footer"><div class="container"><div class="footer-main"><div><a class="brand" href="#home"><span class="brand-mark" aria-hidden="true">D</span><span>DAVELYX<small>SIWES PLUG</small></span></a><p class="footer-description">SIWES report and logbook support for Nigerian students.</p></div><div class="footer-links"><a href="#services">Services</a><a href="#faq">FAQ</a><a href="https://www.facebook.com/share/1ACfi9keN3/" target="_blank" rel="noopener noreferrer">Facebook ↗</a><a href="https://wa.me/2349035589937?text=Hello%20DAVELYX%2C%20I%20need%20SIWES%20Report%20for%20[My%20Dept%20and%20School]" target="_blank" rel="noopener noreferrer">WhatsApp ↗</a></div></div><div class="copyright">© <span id="year"></span> DAVELYX SIWES PLUG. All rights reserved.</div></div></footer>
 
   <a class="whatsapp-float" href="https://wa.me/2349035589937?text=Hello%20DAVELYX%2C%20I%20need%20SIWES%20Report%20for%20[My%20Dept%20and%20School]" target="_blank" rel="noopener noreferrer" aria-label="Chat with DAVELYX on WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.52 3.48A11.8 11.8 0 0 0 12.1 0C5.55 0 .22 5.32.22 11.87c0 2.09.55 4.13 1.59 5.93L.12 24l6.36-1.67a11.9 11.9 0 0 0 5.62 1.42h.01c6.55 0 11.88-5.33 11.88-11.88 0-3.17-1.24-6.15-3.47-8.39ZM12.1 21.73a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.77.99 1.01-3.67-.24-.38a9.83 9.83 0 0 1-1.51-5.21c0-5.47 4.45-9.92 9.93-9.92a9.86 9.86 0 0 1 7.02 2.91 9.87 9.87 0 0 1 2.9 7.02c0 5.47-4.45 9.92-9.94 9.92Zm5.45-7.43c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.03-.53-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.2 5.08 4.49.71.31 1.27.49 1.7.63.72.23 1.37.2 1.88.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35Z"/></svg></a>
 
@@ -385,6 +317,33 @@
       });
     }, { threshold: 0.12 });
     revealItems.forEach((item) => observer.observe(item));
+
+    // CountAPI is best-effort; retain the last successful total if the service is unavailable.
+    const visitorCount = document.getElementById('visitor-count');
+    const savedVisits = Number(localStorage.getItem('davelyxVisitorCount'));
+    if (Number.isFinite(savedVisits) && savedVisits > 0) visitorCount.textContent = `${savedVisits.toLocaleString()} visits`;
+    fetch('https://api.countapi.xyz/hit/davelyx-siwes-plug/visits')
+      .then((response) => {
+        if (!response.ok) throw new Error(`Visitor count request failed: ${response.status}`);
+        return response.json();
+      })
+      .then((data) => {
+        if (Number.isFinite(data.value)) {
+          visitorCount.textContent = `${data.value.toLocaleString()} visits`;
+          localStorage.setItem('davelyxVisitorCount', String(data.value));
+        }
+      })
+      .catch((error) => console.warn('Visitor count unavailable:', error));
+
+    // Track outbound WhatsApp clicks locally; no personal data is collected.
+    document.querySelectorAll('a[href*="wa.me/2349035589937"]').forEach((link) => {
+      link.addEventListener('click', () => {
+        const key = 'davelyxWhatsAppClicks';
+        const clicks = Number(localStorage.getItem(key)) || 0;
+        localStorage.setItem(key, String(clicks + 1));
+        console.log('[DAVELYX analytics] WhatsApp click', { clicks: clicks + 1, destination: link.href });
+      });
+    });
 
     const copyButton = document.getElementById('copy-account');
     const accountNumber = document.getElementById('account-number').textContent.trim();
@@ -416,5 +375,6 @@
       }, 2200);
     });
   </script>
+  <script data-goatcounter="https://davelyx.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
