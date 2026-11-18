@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0D221B"><title>Create account | DAVELYX</title>
+  <link rel="stylesheet" href="assets/css/style.css"><link rel="stylesheet" href="assets/css/marketplace.css">
+</head>
+<body>
+  <header class="site-header"><nav class="nav container"><a class="brand" href="index.html">DAVELYX<small> MARKETPLACE</small></a><a href="marketplace.html">Marketplace</a></nav></header>
+  <main class="market-container" style="max-width:520px">
+    <h1>Create a DAVELYX account</h1>
+    <p>Register with your email address and a password.</p>
+    <form id="auth-form">
+      <label>Email address<input name="email" type="email" autocomplete="email" required style="display:block;width:100%;padding:12px;margin:8px 0 16px"></label>
+      <label>Password (at least 8 characters)<input name="password" type="password" minlength="8" autocomplete="new-password" required style="display:block;width:100%;padding:12px;margin:8px 0 16px"></label>
+      <button class="btn btn-gold" type="submit">Create account</button>
+    </form>
+    <p id="auth-status" role="status" aria-live="polite"></p>
+    <p>Already have an account? <a id="login-link" href="login.html">Log in</a></p>
+  </main>
+  <script type="module" src="assets/js/signup.js"></script>
+  <script>const r=new URLSearchParams(location.search).get('redirect');if(r)document.getElementById('login-link').href='login.html?redirect='+encodeURIComponent(r);</script>
+</body>
+</html>
