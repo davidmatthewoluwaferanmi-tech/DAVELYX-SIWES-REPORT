@@ -6,11 +6,19 @@ const detail = document.getElementById('item-detail');
 const status = document.getElementById('item-status');
 let product;
 const price = value => typeof value === 'string' && value.includes('₦') ? value : `₦${Number(value || 0).toLocaleString('en-NG')}`;
+function getWhatsAppLink(phone) {
+  let clean = String(phone || '').replace(/\D/g, '');
+  if (clean.startsWith('0')) clean = '234' + clean.slice(1);
+  if (clean.startsWith('+')) clean = clean.slice(1);
+  if (!clean) return '';
+  return `https://wa.me/${clean}?text=${encodeURIComponent('Hi, I saw your product on Davelyx')}`;
+}
 function draw(item, isOwner = false) {
   const image = Array.isArray(item.images) ? item.images[0] : '';
-  const phone = String(item.seller_whatsapp || item.phone || '2349035589937').replace(/\D/g, '');
+  const phone = item.seller_whatsapp || item.phone || '';
+  const whatsappLink = getWhatsAppLink(phone);
   const banner = isOwner ? `<div id="owner-banner"><p>✅ Your listing is live!</p><div style="display:flex;gap:10px;flex-wrap:wrap"><a id="view-product-btn" href="#product-details">View Product</a><button id="share-link-btn" type="button">Share Your Product Link</button><a id="share-wa-btn" target="_blank" rel="noopener noreferrer" href="#">Share on WhatsApp</a></div><p id="share-product-status" role="status"></p></div>` : '';
-  detail.innerHTML = `${banner}<article class="item-detail-layout" id="product-details"><div class="item-gallery">${image ? `<img class="item-main-photo" src="${escapeHtml(image)}" alt="${escapeHtml(item.title)}">` : '<div class="item-main-photo">No photo available</div>'}</div><div class="item-info"><span class="eyebrow">${escapeHtml(item.category || 'Marketplace')}</span><h1>${escapeHtml(item.title)}</h1><p class="item-price">${price(item.price)}</p><p>${escapeHtml(item.description || '')}</p><p><strong>Location:</strong> ${escapeHtml(item.location || 'Not specified')}</p><div style="display:flex;flex-direction:column;gap:12px;margin-top:20px"><button id="davelyx-chat-btn" type="button" style="width:100%;height:52px;background:#111827;color:white;border:0;border-radius:12px;font-weight:700">Message on DAVELYX</button><a id="whatsapp-btn" href="https://wa.me/${phone}" target="_blank" rel="noopener noreferrer" style="width:100%;height:52px;background:#facc15;color:#111827;border-radius:12px;font-weight:700;display:flex;align-items:center;justify-content:center;text-decoration:none">Contact on WhatsApp</a></div></div></article>`;
+  detail.innerHTML = `${banner}<article class="item-detail-layout" id="product-details"><div class="item-gallery">${image ? `<img class="item-main-photo" src="${escapeHtml(image)}" alt="${escapeHtml(item.title)}">` : '<div class="item-main-photo">No photo available</div>'}</div><div class="item-info"><span class="eyebrow">${escapeHtml(item.category || 'Marketplace')}</span><h1>${escapeHtml(item.title)}</h1><p class="item-price">${price(item.price)}</p><p>${escapeHtml(item.description || '')}</p><p><strong>Location:</strong> ${escapeHtml(item.location || 'Not specified')}</p><div style="display:flex;flex-direction:column;gap:12px;margin-top:20px"><button id="davelyx-chat-btn" type="button" style="width:100%;height:52px;background:#111827;color:white;border:0;border-radius:12px;font-weight:700">Message on DAVELYX</button>${whatsappLink ? `<a id="whatsapp-btn" href="${escapeHtml(whatsappLink)}" target="_blank" rel="noopener noreferrer" style="width:100%;height:52px;background:#facc15;color:#111827;border-radius:12px;font-weight:700;display:flex;align-items:center;justify-content:center;text-decoration:none">Chat on WhatsApp</a>` : ''}</div></div></article>`;
   document.getElementById('davelyx-chat-btn').addEventListener('click', startChat);
   if (isOwner) {
     const shareStatus = document.getElementById('share-product-status');
