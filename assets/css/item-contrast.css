@@ -1,0 +1,36 @@
+/* High-contrast action controls for the listing detail page. */
+#owner-banner {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+#owner-banner button,
+#owner-banner a {
+  color: inherit !important;
+}
+#owner-banner #view-product-btn {
+  background: #111827 !important;
+  color: #fff !important;
+}
+#owner-banner #share-link-btn {
+  background: #fff !important;
+  color: #111827 !important;
+  border: 1px solid #111827 !important;
+}
+#owner-banner #share-wa-btn {
+  background: #25D366 !important;
+  color: #fff !important;
+}
+#davelyx-chat-btn {
+  background: #111827 !important;
+  color: #fff !important;
+}
+#whatsapp-btn {
+  background: #facc15 !important;
+  color: #111827 !important;
+}
+#share-wa-btn[hidden] {
+  display: none !important;
+}

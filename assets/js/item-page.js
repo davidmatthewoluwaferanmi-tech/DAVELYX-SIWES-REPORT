@@ -1,10 +1,5 @@
 import { supabase } from './supabase.js';
 
-const contrastStyles = document.createElement('link');
-contrastStyles.rel = 'stylesheet';
-contrastStyles.href = 'assets/css/marketplace-contrast.css';
-document.head.appendChild(contrastStyles);
-
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
 }[char]));
@@ -21,20 +16,22 @@ function draw(item, isOwner = false) {
   const images = Array.isArray(item.images) ? item.images : [];
   const image = images[0];
   const phone = String(item.seller_whatsapp || item.phone || '2349035589937').replace(/\D/g, '');
-  const ownerBanner = isOwner ? `<section class="owner-listing-banner" aria-label="Your listing is live"><strong>✅ Your listing is live!</strong><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><a class="btn" id="product-page-link" href="#product-details">View Product</a><button class="btn" id="share-product-link" type="button">Share Your Product Link</button><a class="btn" id="share-product-whatsapp" href="#" target="_blank" rel="noopener noreferrer" hidden>Share on WhatsApp</a></div><p id="share-product-status" role="status" aria-live="polite" style="margin-bottom:0"></p></section>` : '';
-  detail.innerHTML = `${ownerBanner}<article class="item-detail-layout" id="product-details"><div class="item-gallery">${image ? `<img class="item-main-photo" src="${escapeHtml(image)}" alt="${escapeHtml(item.title)}">` : '<div class="item-main-photo" aria-label="No listing photo">No photo available</div>'}</div><div class="item-info"><span class="eyebrow">${escapeHtml(item.category || 'Marketplace')}</span><h1>${escapeHtml(item.title)}</h1><p class="item-price">${price(item.price)}</p><p>${escapeHtml(item.description || '')}</p><p><strong>Location:</strong> ${escapeHtml(item.location || 'Not specified')}</p><div class="item-actions"><button class="btn" id="davelyxChatBtn" type="button">Chat on DAVELYX</button><a class="btn" id="contactSellerWhatsApp" href="https://wa.me/${phone}" target="_blank" rel="noopener noreferrer">Contact on WhatsApp</a></div></div></article>`;
-  document.getElementById('davelyxChatBtn').addEventListener('click', startChat);
+  const ownerBanner = isOwner ? `<div id="owner-banner"><p style="color:#166534;font-weight:700;margin:0 0 12px 0">✅ Your listing is live!</p><div style="display:flex;gap:10px;flex-wrap:wrap"><a id="view-product-btn" href="#product-details" style="background:#111827;color:white;padding:10px 18px;border-radius:8px;font-weight:600;text-decoration:none">View Product</a><button id="share-link-btn" type="button" style="background:white;color:#111827;border:1px solid #111827;padding:10px 18px;border-radius:8px;font-weight:600">Share Your Product Link</button><a id="share-wa-btn" href="#" style="background:#25D366;color:white;padding:10px 18px;border-radius:8px;font-weight:600;text-decoration:none">Share on WhatsApp</a></div><p id="share-product-status" role="status" aria-live="polite" style="margin-bottom:0"></p></div>` : '';
+  detail.innerHTML = `${ownerBanner}<article class="item-detail-layout" id="product-details"><div class="item-gallery">${image ? `<img class="item-main-photo" src="${escapeHtml(image)}" alt="${escapeHtml(item.title)}">` : '<div class="item-main-photo" aria-label="No listing photo">No photo available</div>'}</div><div class="item-info"><span class="eyebrow">${escapeHtml(item.category || 'Marketplace')}</span><h1>${escapeHtml(item.title)}</h1><p class="item-price">${price(item.price)}</p><p>${escapeHtml(item.description || '')}</p><p><strong>Location:</strong> ${escapeHtml(item.location || 'Not specified')}</p><div style="display:flex;flex-direction:column;gap:12px;margin-top:20px"><button id="davelyx-chat-btn" type="button" style="width:100%;height:52px;background:#111827;color:white;border:none;border-radius:12px;font-weight:700;font-size:16px;cursor:pointer">Message on DAVELYX</button><a id="whatsapp-btn" href="#" style="width:100%;height:52px;background:#facc15;color:#111827;border:none;border-radius:12px;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;text-decoration:none">Contact on WhatsApp</a></div></div></article>`;
+  document.getElementById('davelyx-chat-btn').addEventListener('click', startChat);
+  document.getElementById('whatsapp-btn').href = `https://wa.me/${phone}`;
 
   if (isOwner) {
-    const shareButton = document.getElementById('share-product-link');
+    const shareButton = document.getElementById('share-link-btn');
     const shareStatus = document.getElementById('share-product-status');
-    const whatsappButton = document.getElementById('share-product-whatsapp');
+    const whatsappButton = document.getElementById('share-wa-btn');
     whatsappButton.href = `https://wa.me/?text=${encodeURIComponent(`Check my product on DAVELYX: ${window.location.href}`)}`;
+    whatsappButton.target = '_blank';
+    whatsappButton.rel = 'noopener noreferrer';
     shareButton.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(window.location.href);
         shareStatus.textContent = 'Link copied! Share on WhatsApp';
-        whatsappButton.hidden = false;
       } catch (error) {
         console.error('Unable to copy product link:', error);
         shareStatus.textContent = 'Could not copy the link. Please copy the page URL to share it.';
