@@ -29,7 +29,7 @@ async function startChat() {
       return;
     }
     if (!product.seller_id) {
-      status.textContent = 'This demo listing has no DAVELYX Chat account yet. Use WhatsApp to contact the seller.';
+      status.textContent = 'This listing has no DAVELYX Chat account yet. Use WhatsApp to contact the seller.';
       return;
     }
     if (product.seller_id === session.user.id) {
@@ -53,25 +53,27 @@ async function startChat() {
     detail.innerHTML = '<p>Listing not found. <a href="marketplace.html">Browse listings</a>.</p>';
     return;
   }
-  // Product listings are intentionally readable by the anon role; see the public SELECT policy in supabase-schema.sql.
-  const { data, error } = await supabase.from('products').select('*').eq('id', id).maybeSingle();
-  if (error) {
-    console.error(`Product fetch failed for id ${id}:`, error);
-    status.textContent = `Could not load listing: ${error.message}`;
-  }
-  if (data) product = data;
-  if (!product && ['1', '2', '3', '4'].includes(String(id))) {
-    const samples = {
-      '1': { id: '1', title: 'DAVELYX: SIWES Logbook Printed & Bound - Delivered', price: 12000, category: 'SIWES', location: 'Any Location', description: 'Printed and bound SIWES logbook, delivered.', seller_whatsapp: '2349035589937' },
-      '2': { id: '2', title: 'DAVELYX: Mini Powerbank 20000mAh Fast Charge', price: 15000, category: 'Laptops', location: 'Lagos', description: 'Fast-charge 20000mAh mini powerbank.', seller_whatsapp: '2349035589937' },
-      '3': { id: '3', title: 'DAVELYX: Student Laptop Stand Adjustable', price: 9500, category: 'Furniture', location: 'Ibadan', description: 'Adjustable laptop stand for students.', seller_whatsapp: '2349035589937' },
-      '4': { id: '4', title: 'iPhone 11 64GB Neatly Used', price: 125000, category: 'Phones', location: 'Lagos', description: 'Verified sample listing.', seller_whatsapp: '2349035589937' }
-    };
-    product = samples[id];
-  }
-  if (!product) {
-    detail.innerHTML = '<p>Listing not found. <a href="marketplace.html">Browse listings</a>.</p>';
+  // Legacy m-prefixed links refer to retired demo products and are not UUIDs in Supabase.
+  if (id.startsWith('m')) {
+    detail.innerHTML = '<p>This is a demo listing, not in the database. <a href="index.html#marketplace-section">Browse live listings</a>.</p>';
     return;
   }
-  draw(product);
+  try {
+    const { data, error } = await supabase.from('products').select('*').eq('id', id).maybeSingle();
+    if (error) throw error;
+    if (!data) {
+      detail.innerHTML = '<p>Listing not found. <a href="marketplace.html">Browse listings</a>.</p>';
+      return;
+    }
+    product = data;
+    draw(product);
+  } catch (error) {
+    console.error(`Product fetch failed for id ${id}:`, error);
+    if (/invalid input syntax for type uuid/i.test(error.message || '')) {
+      detail.innerHTML = '<p>This is a demo listing, not in the database. <a href="index.html#marketplace-section">Browse live listings</a>.</p>';
+      return;
+    }
+    status.textContent = `Could not load listing: ${error.message}`;
+    detail.innerHTML = '<p>We could not load this listing right now. <a href="marketplace.html">Browse listings</a>.</p>';
+  }
 })();
