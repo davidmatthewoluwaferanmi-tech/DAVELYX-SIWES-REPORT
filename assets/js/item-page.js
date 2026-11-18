@@ -1,5 +1,10 @@
 import { supabase } from './supabase.js';
 
+const contrastStyles = document.createElement('link');
+contrastStyles.rel = 'stylesheet';
+contrastStyles.href = 'assets/css/marketplace-contrast.css';
+document.head.appendChild(contrastStyles);
+
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
 }[char]));
@@ -16,8 +21,8 @@ function draw(item, isOwner = false) {
   const images = Array.isArray(item.images) ? item.images : [];
   const image = images[0];
   const phone = String(item.seller_whatsapp || item.phone || '2349035589937').replace(/\D/g, '');
-  const ownerBanner = isOwner ? `<section class="owner-listing-banner" style="background:#e8f7ed;border:1px solid #9ed5ad;border-radius:14px;padding:18px;margin-bottom:20px" aria-label="Your listing is live"><strong>✅ Your listing is live!</strong><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><a class="btn btn-gold" href="#product-details">View Product</a><button class="btn btn-outline" id="share-product-link" type="button">Share Your Product Link</button><a class="btn btn-outline" id="share-product-whatsapp" href="#" target="_blank" rel="noopener noreferrer" hidden>Share on WhatsApp</a></div><p id="share-product-status" role="status" aria-live="polite" style="margin-bottom:0"></p></section>` : '';
-  detail.innerHTML = `${ownerBanner}<article class="item-detail-layout" id="product-details"><div class="item-gallery">${image ? `<img class="item-main-photo" src="${escapeHtml(image)}" alt="${escapeHtml(item.title)}">` : '<div class="item-main-photo" aria-label="No listing photo">No photo available</div>'}</div><div class="item-info"><span class="eyebrow">${escapeHtml(item.category || 'Marketplace')}</span><h1>${escapeHtml(item.title)}</h1><p class="item-price">${price(item.price)}</p><p>${escapeHtml(item.description || '')}</p><p><strong>Location:</strong> ${escapeHtml(item.location || 'Not specified')}</p><div class="item-actions"><a class="btn btn-gold" href="https://wa.me/${phone}" target="_blank" rel="noopener noreferrer">Contact on WhatsApp</a><button class="btn btn-outline" id="davelyxChatBtn" type="button">Message on DAVELYX</button></div></div></article>`;
+  const ownerBanner = isOwner ? `<section class="owner-listing-banner" aria-label="Your listing is live"><strong>✅ Your listing is live!</strong><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><a class="btn" id="product-page-link" href="#product-details">View Product</a><button class="btn" id="share-product-link" type="button">Share Your Product Link</button><a class="btn" id="share-product-whatsapp" href="#" target="_blank" rel="noopener noreferrer" hidden>Share on WhatsApp</a></div><p id="share-product-status" role="status" aria-live="polite" style="margin-bottom:0"></p></section>` : '';
+  detail.innerHTML = `${ownerBanner}<article class="item-detail-layout" id="product-details"><div class="item-gallery">${image ? `<img class="item-main-photo" src="${escapeHtml(image)}" alt="${escapeHtml(item.title)}">` : '<div class="item-main-photo" aria-label="No listing photo">No photo available</div>'}</div><div class="item-info"><span class="eyebrow">${escapeHtml(item.category || 'Marketplace')}</span><h1>${escapeHtml(item.title)}</h1><p class="item-price">${price(item.price)}</p><p>${escapeHtml(item.description || '')}</p><p><strong>Location:</strong> ${escapeHtml(item.location || 'Not specified')}</p><div class="item-actions"><button class="btn" id="davelyxChatBtn" type="button">Chat on DAVELYX</button><a class="btn" id="contactSellerWhatsApp" href="https://wa.me/${phone}" target="_blank" rel="noopener noreferrer">Contact on WhatsApp</a></div></div></article>`;
   document.getElementById('davelyxChatBtn').addEventListener('click', startChat);
 
   if (isOwner) {

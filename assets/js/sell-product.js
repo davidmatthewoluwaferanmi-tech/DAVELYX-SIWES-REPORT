@@ -1,5 +1,10 @@
 import { supabase } from './supabase.js';
 
+const contrastStyles = document.createElement('link');
+contrastStyles.rel = 'stylesheet';
+contrastStyles.href = 'assets/css/marketplace-contrast.css';
+document.head.appendChild(contrastStyles);
+
 const form = document.getElementById('sell-form');
 const status = document.getElementById('sell-status');
 const payLink = document.getElementById('sellerPayBtn');
@@ -69,7 +74,7 @@ async function publishListing(user) {
   } finally { isPublishing = false; }
 }
 form.addEventListener('submit', async event => {
-  event.preventEvent();
+  event.preventDefault();
   try {
     const user = await currentUser();
     if (!user) { status.textContent = 'Log in with your email and password to publish your listing.'; openAuthModal(); return; }

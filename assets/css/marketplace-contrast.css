@@ -1,0 +1,77 @@
+/* High-contrast marketplace action controls. */
+.owner-listing-banner {
+  background: #f0fdf4 !important;
+  border: 1px solid #bbf7d0 !important;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+.owner-listing-banner .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  opacity: 1;
+}
+.owner-listing-banner #product-page-link {
+  background: #111827 !important;
+  color: #fff !important;
+}
+.owner-listing-banner #share-product-link {
+  background: #fff !important;
+  color: #111827 !important;
+  border: 1px solid #111827 !important;
+}
+.owner-listing-banner #share-product-whatsapp {
+  background: #25D366 !important;
+  color: #fff !important;
+  border: 1px solid #25D366 !important;
+}
+.owner-listing-banner #share-product-whatsapp[hidden] {
+  display: none !important;
+}
+.item-detail-layout .item-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+.item-detail-layout .item-actions > #davelyxChatBtn,
+.item-detail-layout .item-actions > #contactSellerWhatsApp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  height: 52px;
+  margin: 0;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
+  opacity: 1;
+}
+.item-detail-layout .item-actions > #davelyxChatBtn {
+  order: 1;
+  background: #111827 !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+.item-detail-layout .item-actions > #contactSellerWhatsApp {
+  order: 2;
+  margin-top: 12px;
+  background: #facc15 !important;
+  color: #111827 !important;
+  font-weight: 600;
+}
+.sell-form > button[type="submit"] {
+  background: #111827 !important;
+  color: #fff !important;
+  font-weight: 700;
+}
