@@ -39,13 +39,33 @@
   const orderMessage = (details) => `Hello DAVELYX! I just paid for ${details.package} via Selar. My order details: Name: ${details.name}, Dept: ${details.department}, School: ${details.institution}, Company: ${details.company}, Location: ${details.location}, Duration: ${details.duration}, My WhatsApp: ${details.whatsapp}. Please confirm my order for 24hr delivery.`;
   window.DavelyxApp = { orderDetails, validOrder, orderMessage, formStatus };
 
-  const navLinks = document.querySelector('.nav-links');
-  if (navLinks && !navLinks.querySelector('a[href="marketplace.html"]')) {
-    const home = document.createElement('a'); home.href = 'index.html'; home.textContent = 'Home'; navLinks.prepend(home);
-    const market = document.createElement('a'); market.href = 'marketplace.html'; market.textContent = 'Marketplace'; navLinks.appendChild(market);
-    const products = navLinks.querySelector('a[href="#products"]'); if (products) products.href = 'index.html#products';
-    const how = navLinks.querySelector('a[href="#how-it-works"]'); if (how) how.href = 'index.html#how-it-works';
+  // Keep the marketplace entry points visible even if the cached homepage markup predates the marketplace launch.
+  const nav = document.querySelector('.site-header .nav');
+  const navLinks = nav && nav.querySelector('.nav-links');
+  if (navLinks) {
+    if (!navLinks.querySelector('a[href="marketplace.html"]')) {
+      const link = document.createElement('a'); link.href = 'marketplace.html'; link.textContent = 'Marketplace'; navLinks.appendChild(link);
+    }
+    if (!nav.querySelector('a[href="sell.html"]')) {
+      const sellLink = document.createElement('a'); sellLink.href = 'sell.html'; sellLink.textContent = '+ Sell';
+      sellLink.style.cssText = 'background:#ff6a00;color:white;padding:8px 16px;border-radius:20px;font-weight:800';
+      nav.appendChild(sellLink);
+    }
   }
+  const heroActions = document.querySelector('.hero-actions');
+  if (heroActions && !heroActions.querySelector('a[href="marketplace.html"]')) {
+    const browse = document.createElement('a'); browse.className = 'btn btn-gold'; browse.href = 'marketplace.html'; browse.textContent = 'Browse Marketplace (Buy Anything)';
+    const sell = document.createElement('a'); sell.className = 'btn btn-outline'; sell.href = 'sell.html'; sell.textContent = 'Sell Anything - Free';
+    heroActions.append(browse, sell);
+  }
+  const orderCard = document.querySelector('#order .order-card');
+  if (orderCard && !orderCard.querySelector('.marketplace-promo')) {
+    const banner = document.createElement('div'); banner.className = 'marketplace-promo';
+    banner.style.cssText = 'background:#fff3e0;padding:15px;border-radius:10px;text-align:center;margin:0 0 20px;color:#0D221B';
+    banner.innerHTML = 'Want to buy/sell anything like Jiji? <a href="marketplace.html" style="font-weight:800;text-decoration:underline">Go to DAVELYX Marketplace - No account needed to buy</a>';
+    orderCard.insertBefore(banner, orderCard.firstChild);
+  }
+
   document.getElementById('whatsapp-number').addEventListener('input', (event) => event.currentTarget.setCustomValidity(''));
   document.getElementById('tawk-order').addEventListener('click', () => {
     const details = validOrder(); if (!details) return;
