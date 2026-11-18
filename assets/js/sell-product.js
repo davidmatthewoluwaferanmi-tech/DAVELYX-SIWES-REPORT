@@ -5,19 +5,20 @@ const payLink = document.getElementById('sellerPayBtn');
 const modal = document.getElementById('seller-auth-modal');
 const authForm = document.getElementById('seller-auth-form');
 const authStatus = document.getElementById('seller-auth-status');
-let authIdentity = '';
-let authMethod = 'email';
+const emailInput = document.getElementById('seller-identity');
+const otpInput = document.getElementById('seller-otp');
 let isPublishing = false;
 
+emailInput.type = 'email'; emailInput.autocomplete = 'email'; emailInput.required = true;
+const emailLabel = emailInput.closest('label'); if (emailLabel) emailLabel.firstChild.textContent = 'Email address ';
+const passwordInput = document.getElementById('seller-password');
+if (passwordInput) { const label = passwordInput.closest('label'); if (label) label.hidden = true; passwordInput.required = false; }
+const authSubmit = authForm.querySelector('button[type="submit"]'); if (authSubmit) authSubmit.textContent = 'Send verification code';
 document.querySelectorAll('#featurePay,#verifyPay').forEach(box => box.addEventListener('change', () => {
   payLink.hidden = !(document.getElementById('featurePay').checked || document.getElementById('verifyPay').checked);
 }));
-function openAuthModal() { modal.hidden = false; modal.style.display = 'grid'; document.getElementById('seller-identity').focus(); }
+function openAuthModal() { modal.hidden = false; modal.style.display = 'grid'; emailInput.focus(); }
 function closeAuthModal() { modal.hidden = true; modal.style.display = 'none'; }
-function identityOptions(identity, password) {
-  const isPhone = /^\+?[\d\s()-]{8,}$/.test(identity);
-  return isPhone ? { phone: identity, password } : { email: identity, password };
-}
 async function currentUser() {
   const { data, error } = await supabase.auth.getUser();
   if (error && error.name !== 'AuthSessionMissingError') throw error;
@@ -39,9 +40,8 @@ async function publishListing(user) {
       if (uploadError) throw new Error(`Photo upload failed: ${uploadError.message}`);
       images.push(supabase.storage.from('product-images').getPublicUrl(path).data.publicUrl);
     }
-    // Re-check the verified auth user immediately before writing the seller-owned product.
     const verifiedUser = await currentUser();
-    if (!verifiedUser || verifiedUser.id !== user.id) throw new Error('Your sign-in expired. Please sign in again.');
+    if (!verifiedUser || verifiedUser.id !== user.id) throw new Error('Your sign-in expired. Please request a new code.');
     const { data: product, error } = await supabase.from('products').insert({
       title: String(data.get('title') || '').trim(), price: Number(data.get('price')),
       description: String(data.get('description') || '').trim(), category: String(data.get('category')),
@@ -49,7 +49,7 @@ async function publishListing(user) {
       seller_whatsapp: String(data.get('phone') || '').trim(), is_official: false, is_featured: false, is_verified: false
     }).select('id').single();
     if (error) throw error;
-    status.textContent = `Listing published. View it here: ${location.origin}${location.pathname.replace(/sell\.html$/, '')}item.html?id=${encodeURIComponent(product.id)}. Selected promotion payments must be verified before badges are activated.`;
+    status.textContent = `Listing published. View it here: ${location.origin}${location.pathname.replace(/sell\\.html$/, '')}item.html?id=${encodeURIComponent(product.id)}. Selected promotion payments must be verified before badges are activated.`;
     form.reset(); payLink.hidden = true;
   } catch (error) {
     status.textContent = `Could not publish listing: ${error.message}`;
@@ -59,37 +59,34 @@ form.addEventListener('submit', async event => {
   event.preventDefault();
   try {
     const user = await currentUser();
-    if (!user) { status.textContent = 'Create an account or sign in to publish your listing.'; openAuthModal(); return; }
+    if (!user) { status.textContent = 'Check email for a 6-digit code to sign in and publish your listing.'; openAuthModal(); return; }
     await publishListing(user);
   } catch (error) { status.textContent = `Authentication check failed: ${error.message}`; }
 });
 authForm.addEventListener('submit', async event => {
   event.preventDefault();
-  authIdentity = document.getElementById('seller-identity').value.trim();
-  const password = document.getElementById('seller-password').value;
-  authMethod = /^\+?[\d\s()-]{8,}$/.test(authIdentity) ? 'phone' : 'email';
-  authStatus.textContent = 'Creating account…';
-  let result = await supabase.auth.signUp(identityOptions(authIdentity, password));
-  if (result.error && /already registered|already been registered/i.test(result.error.message)) {
-    result = await supabase.auth.signInWithPassword(identityOptions(authIdentity, password));
-  }
-  if (result.error) { authStatus.textContent = result.error.message; return; }
-  if (result.data.session) {
-    const user = result.data.user || result.data.session.user;
-    closeAuthModal(); await publishListing(user); return;
-  }
+  const email = emailInput.value.trim();
+  if (!email) { authStatus.textContent = 'Enter a valid email address.'; return; }
+  authStatus.textContent = 'Sending verification code…';
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: 'https://davidmatthewoluwaferanmi-tech.github.io/DAVELYX-SIWES-REPORT/',
+      shouldCreateUser: true
+    }
+  });
+  if (error) { authStatus.textContent = error.message; return; }
   document.getElementById('seller-otp-area').hidden = false;
-  authStatus.textContent = `A verification code was sent. Enter it below to finish sign-in.${result.data.user ? '' : ' If an account already exists, use its password.'}`;
+  authStatus.textContent = 'Check email for 6-digit code.';
 });
 document.getElementById('verify-seller-otp').addEventListener('click', async () => {
-  const token = document.getElementById('seller-otp').value.trim();
-  if (!token) { authStatus.textContent = 'Enter the verification code.'; return; }
-  const credentials = authMethod === 'phone' ? { phone: authIdentity, token, type: 'sms' } : { email: authIdentity, token, type: 'signup' };
-  const { data, error } = await supabase.auth.verifyOtp(credentials);
+  const email = emailInput.value.trim(); const token = otpInput.value.trim();
+  if (!email || !token) { authStatus.textContent = 'Enter your email address and 6-digit code.'; return; }
+  const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
   if (error) { authStatus.textContent = error.message; return; }
-  closeAuthModal();
   const user = data.user || await currentUser();
-  if (!user) { openAuthModal(); authStatus.textContent = 'Verification succeeded, but no signed-in user was returned. Sign in and try again.'; return; }
+  if (!user) { authStatus.textContent = 'Code verified but no signed-in user was returned. Request a new code and try again.'; return; }
+  closeAuthModal();
   await publishListing(user);
 });
 document.getElementById('cancel-seller-auth').addEventListener('click', closeAuthModal);

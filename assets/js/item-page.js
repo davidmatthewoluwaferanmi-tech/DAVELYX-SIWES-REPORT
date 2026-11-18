@@ -8,13 +8,16 @@ const mockItems = [
 ];
 let product; let user; const id = new URLSearchParams(location.search).get('id');
 const detail = document.getElementById('item-detail'); const status = document.getElementById('item-status'); const modal = document.getElementById('login-modal');
+const emailInput = document.getElementById('login-identity');
+const otpInput = document.getElementById('login-otp');
+const loginOutput = document.getElementById('login-status');
 function price(value){ return typeof value === 'string' && value.includes('₦') ? value : `₦${Number(value||0).toLocaleString('en-NG')}`; }
 function draw(item){
   const image = item.images?.[0]; const phone = String(item.seller_whatsapp || item.phone || '2349035589937').replace(/\D/g,'');
   detail.innerHTML = `<article class="item-detail-layout"><div class="item-gallery">${image ? `<img class="item-main-photo" src="${escapeHtml(image)}" alt="${escapeHtml(item.title)}">` : '<div class="item-main-photo" style="display:grid;place-items:center;background:#f2f2f2;font-size:64px">🛍️</div>'}</div><div><span class="eyebrow">${item.is_official?'DAVELYX OFFICIAL STORE':item.is_featured?'FEATURED':'Marketplace listing'}</span><h1>${escapeHtml(item.title)}</h1><p style="font-size:28px;font-weight:800">${escapeHtml(price(item.price))}</p><p>${escapeHtml(item.description||'')}</p><p>${escapeHtml(item.location||'')}</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button id="davelyxChatBtn" class="btn btn-gold" type="button">💬 Chat on DAVELYX</button><a id="waChatBtn" class="btn btn-outline" target="_blank" rel="noopener noreferrer" href="https://wa.me/${phone}?text=${encodeURIComponent(`Hi, I'm interested in ${item.title} listed for ${price(item.price)} on DAVELYX Marketplace`)}">Chat on WhatsApp (Optional)</a></div></div></article>`;
   document.getElementById('davelyxChatBtn').addEventListener('click', startChat);
 }
-function showModal(){ modal.hidden=false; modal.style.display='grid'; document.getElementById('login-identity').focus(); }
+function showModal(){ modal.hidden=false; modal.style.display='grid'; emailInput.focus(); }
 function hideModal(){ modal.hidden=true; modal.style.display='none'; }
 async function readUser(){ const {data,error}=await supabase.auth.getUser(); if(error&&error.name!=='AuthSessionMissingError') throw error; return data?.user||null; }
 async function startChat(){
@@ -30,19 +33,24 @@ async function createConversation(){
   if(error){status.textContent=error.message;return;}
   location.href=`chat.html?conversation_id=${encodeURIComponent(data.id)}`;
 }
+emailInput.type='email'; emailInput.autocomplete='email'; emailInput.required=true;
+const emailLabel=emailInput.closest('label'); if(emailLabel) emailLabel.firstChild.textContent='Email address ';
 document.getElementById('send-login-code').addEventListener('click',async()=>{
-  const identity=document.getElementById('login-identity').value.trim(); const output=document.getElementById('login-status');
-  if(!identity){output.textContent='Enter an email address or phone number.';return;}
-  const isPhone=/^\+?[\d\s()-]{8,}$/.test(identity);
-  const {error}=await supabase.auth.signInWithOtp(isPhone?{phone:identity}:{email:identity});
-  if(error){output.textContent=error.message;return;}
-  document.getElementById('otp-area').hidden=false; output.textContent=`Code sent. Enter the code${isPhone?' sent by SMS':' from your email'} to continue.`;
+  const email=emailInput.value.trim();
+  if(!email){loginOutput.textContent='Enter a valid email address.';emailInput.focus();return;}
+  const {error}=await supabase.auth.signInWithOtp({email,options:{emailRedirectTo:'https://davidmatthewoluwaferanmi-tech.github.io/DAVELYX-SIWES-REPORT/',shouldCreateUser:true}});
+  if(error){loginOutput.textContent=error.message;return;}
+  document.getElementById('otp-area').hidden=false;
+  loginOutput.textContent='Check email for 6-digit code.';
 });
 document.getElementById('verify-login-code').addEventListener('click',async()=>{
-  const identity=document.getElementById('login-identity').value.trim(); const token=document.getElementById('login-otp').value.trim(); const isPhone=/^\+?[\d\s()-]{8,}$/.test(identity);
-  const {data,error}=await supabase.auth.verifyOtp(isPhone?{phone:identity,token,type:'sms'}:{email:identity,token,type:'email'});
-  if(error){document.getElementById('login-status').textContent=error.message;return;}
-  user=data.user||await readUser();hideModal();await createConversation();
+  const email=emailInput.value.trim(); const token=otpInput.value.trim();
+  if(!email||!token){loginOutput.textContent='Enter your email and 6-digit code.';return;}
+  const {data,error}=await supabase.auth.verifyOtp({email,token,type:'email'});
+  if(error){loginOutput.textContent=error.message;return;}
+  user=data.user||await readUser();
+  if(!user){loginOutput.textContent='Code verified but no session was created. Please request a new code and try again.';return;}
+  hideModal(); await createConversation();
 });
 document.getElementById('close-login').addEventListener('click',hideModal);
 (async()=>{
