@@ -10,7 +10,6 @@ const emailInput = document.getElementById('seller-identity');
 const passwordInput = document.getElementById('seller-password');
 let isPublishing = false;
 
-// Remove legacy one-time-code controls before they can be used or displayed.
 document.getElementById('seller-otp-area')?.remove();
 if (emailInput) {
   emailInput.type = 'email';
@@ -64,14 +63,13 @@ async function publishListing(user) {
       seller_whatsapp: String(data.get('phone') || '').trim(), is_official: false, is_featured: false, is_verified: false
     }).select('id').single();
     if (error) throw error;
-    status.textContent = `Listing published. View it here: ${location.origin}${location.pathname.replace(/sell\\.html$/, '')}item.html?id=${encodeURIComponent(product.id)}. Selected promotion payments must be verified before badges are activated.`;
-    form.reset(); payLink.hidden = true;
+    window.location.href = `/item.html?id=${encodeURIComponent(product.id)}`;
   } catch (error) {
     status.textContent = `Could not publish listing: ${error.message}`;
   } finally { isPublishing = false; }
 }
 form.addEventListener('submit', async event => {
-  event.preventDefault();
+  event.preventEvent();
   try {
     const user = await currentUser();
     if (!user) { status.textContent = 'Log in with your email and password to publish your listing.'; openAuthModal(); return; }

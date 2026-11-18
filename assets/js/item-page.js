@@ -12,12 +12,30 @@ function price(value) {
   return typeof value === 'string' && value.includes('₦') ? value : `₦${Number(value || 0).toLocaleString('en-NG')}`;
 }
 
-function draw(item) {
+function draw(item, isOwner = false) {
   const images = Array.isArray(item.images) ? item.images : [];
   const image = images[0];
   const phone = String(item.seller_whatsapp || item.phone || '2349035589937').replace(/\D/g, '');
-  detail.innerHTML = `<article class="item-detail-layout"><div class="item-gallery">${image ? `<img class="item-main-photo" src="${escapeHtml(image)}" alt="${escapeHtml(item.title)}">` : '<div class="item-main-photo" aria-label="No listing photo">No photo available</div>'}</div><div class="item-info"><span class="eyebrow">${escapeHtml(item.category || 'Marketplace')}</span><h1>${escapeHtml(item.title)}</h1><p class="item-price">${price(item.price)}</p><p>${escapeHtml(item.description || '')}</p><p><strong>Location:</strong> ${escapeHtml(item.location || 'Not specified')}</p><div class="item-actions"><a class="btn btn-gold" href="https://wa.me/${phone}" target="_blank" rel="noopener noreferrer">Contact on WhatsApp</a><button class="btn btn-outline" id="davelyxChatBtn" type="button">Message on DAVELYX</button></div></div></article>`;
+  const ownerBanner = isOwner ? `<section class="owner-listing-banner" style="background:#e8f7ed;border:1px solid #9ed5ad;border-radius:14px;padding:18px;margin-bottom:20px" aria-label="Your listing is live"><strong>✅ Your listing is live!</strong><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><a class="btn btn-gold" href="#product-details">View Product</a><button class="btn btn-outline" id="share-product-link" type="button">Share Your Product Link</button><a class="btn btn-outline" id="share-product-whatsapp" href="#" target="_blank" rel="noopener noreferrer" hidden>Share on WhatsApp</a></div><p id="share-product-status" role="status" aria-live="polite" style="margin-bottom:0"></p></section>` : '';
+  detail.innerHTML = `${ownerBanner}<article class="item-detail-layout" id="product-details"><div class="item-gallery">${image ? `<img class="item-main-photo" src="${escapeHtml(image)}" alt="${escapeHtml(item.title)}">` : '<div class="item-main-photo" aria-label="No listing photo">No photo available</div>'}</div><div class="item-info"><span class="eyebrow">${escapeHtml(item.category || 'Marketplace')}</span><h1>${escapeHtml(item.title)}</h1><p class="item-price">${price(item.price)}</p><p>${escapeHtml(item.description || '')}</p><p><strong>Location:</strong> ${escapeHtml(item.location || 'Not specified')}</p><div class="item-actions"><a class="btn btn-gold" href="https://wa.me/${phone}" target="_blank" rel="noopener noreferrer">Contact on WhatsApp</a><button class="btn btn-outline" id="davelyxChatBtn" type="button">Message on DAVELYX</button></div></div></article>`;
   document.getElementById('davelyxChatBtn').addEventListener('click', startChat);
+
+  if (isOwner) {
+    const shareButton = document.getElementById('share-product-link');
+    const shareStatus = document.getElementById('share-product-status');
+    const whatsappButton = document.getElementById('share-product-whatsapp');
+    whatsappButton.href = `https://wa.me/?text=${encodeURIComponent(`Check my product on DAVELYX: ${window.location.href}`)}`;
+    shareButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        shareStatus.textContent = 'Link copied! Share on WhatsApp';
+        whatsappButton.hidden = false;
+      } catch (error) {
+        console.error('Unable to copy product link:', error);
+        shareStatus.textContent = 'Could not copy the link. Please copy the page URL to share it.';
+      }
+    });
+  }
 }
 
 async function startChat() {
@@ -53,7 +71,6 @@ async function startChat() {
     detail.innerHTML = '<p>Listing not found. <a href="marketplace.html">Browse listings</a>.</p>';
     return;
   }
-  // Legacy m-prefixed links refer to retired demo products and are not UUIDs in Supabase.
   if (id.startsWith('m')) {
     detail.innerHTML = '<p>This is a demo listing, not in the database. <a href="index.html#marketplace-section">Browse live listings</a>.</p>';
     return;
@@ -66,7 +83,9 @@ async function startChat() {
       return;
     }
     product = data;
-    draw(product);
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError) throw sessionError;
+    draw(product, Boolean(session && product.seller_id && session.user.id === product.seller_id));
   } catch (error) {
     console.error(`Product fetch failed for id ${id}:`, error);
     if (/invalid input syntax for type uuid/i.test(error.message || '')) {
