@@ -14,13 +14,30 @@ create table if not exists public.chats (
   unique(product_id,buyer_id),
   check (buyer_id <> seller_id)
 );
+
+-- Keep chat_messages compatible with both earlier body-based deployments and
+-- installations that created the table with the requested content column.
 create table if not exists public.chat_messages (
   id uuid primary key default gen_random_uuid(),
   chat_id uuid not null references public.chats(id) on delete cascade,
   sender_id uuid not null references auth.users(id) on delete cascade,
-  body text not null check (length(body) between 1 and 5000),
-  created_at timestamptz not null default now()
+  content text not null default '',
+  created_at timestamptz with time zone default now()
 );
+alter table public.chat_messages add column if not exists content text;
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'chat_messages' and column_name = 'body'
+  ) then
+    execute 'update public.chat_messages set content = coalesce(nullif(content, ''''), body, '''') where content is null or content = ''''';
+  end if;
+end $$;
+update public.chat_messages set content = '' where content is null;
+alter table public.chat_messages alter column content set default '';
+alter table public.chat_messages alter column content set not null;
+
 alter table public.chats enable row level security;
 alter table public.chat_messages enable row level security;
 drop policy if exists "Chat participants read chats" on public.chats;

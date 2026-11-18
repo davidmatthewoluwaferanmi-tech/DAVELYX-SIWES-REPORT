@@ -11,20 +11,13 @@
 .site-header .nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;min-width:0}
 .marketplace-account-nav{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap;min-width:0;max-width:100%}
 .marketplace-account-nav a{color:inherit;text-decoration:none;font-weight:700;white-space:nowrap}
-.marketplace-account-nav .account-name{display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
+.marketplace-account-nav .account-name{display:inline-block;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
 .marketplace-account-nav img{width:32px;height:32px;object-fit:cover;border-radius:50%;vertical-align:middle;flex:0 0 auto}
-@media(max-width:700px){
-  .site-header .nav{row-gap:8px}
-  .marketplace-account-nav{order:3;width:100%;justify-content:flex-start;padding:8px 0;gap:10px}
-  .marketplace-account-nav a{font-size:14px}
-}
+@media(max-width:700px){.site-header .nav{row-gap:8px}.marketplace-account-nav{order:3;width:100%;justify-content:flex-start;padding:8px 0;gap:10px}.marketplace-account-nav a{font-size:14px}}
 
 /* Auth and profile forms use one field per row to prevent input overlap. */
 #auth-form,#profile-setup-form{display:block;width:100%;max-width:520px}
 #auth-form label,#profile-setup-form label{display:flex;flex-direction:column;gap:6px;margin:0 0 18px;font-weight:600;min-width:0}
-#auth-form input,#auth-form select,#profile-setup-form input,#profile-setup-form select{
-  display:block;width:100%;max-width:400px;height:44px;padding:10px 12px;margin:0;
-  border:1px solid #ccd5ce;border-radius:8px;background:#fff;color:#111827;font:inherit;
-}
+#auth-form input,#auth-form select,#profile-setup-form input,#profile-setup-form select{display:block;width:100%;max-width:400px;height:44px;padding:10px 12px;margin:0;border:1px solid #ccd5ce;border-radius:8px;background:#fff;color:#111827;font:inherit}
 #profile-setup-form input[type="file"]{height:auto;min-height:44px}
 #auth-form button,#profile-setup-form button{display:inline-flex;align-items:center;justify-content:center;min-height:44px}
