@@ -9,8 +9,7 @@ if (authError || !session) {
   chatList.innerHTML = `<a href="login.html?next=${encodeURIComponent(location.pathname + location.search)}">Log in</a>`;
   form.hidden = true;
 } else if (!chatId) {
-  // Chats are the canonical conversation index. Include chats where this user is
-  // either the buyer or seller, then fetch the latest actual message per chat.
+  // chats records carry buyer_id and seller_id; this includes both sides' inboxes.
   const { data: chats, error } = await supabase.from('chats')
     .select('id,product_id,buyer_id,seller_id,last_message,updated_at,products(title,images)')
     .or(`buyer_id.eq.${session.user.id},seller_id.eq.${session.user.id}`)
@@ -52,6 +51,9 @@ if (authError || !session) {
     const { data: initial, error: loadError } = await supabase.from('chat_messages').select('id,sender_id,content,created_at').eq('chat_id', chatId).order('created_at');
     if (loadError) status.textContent = `Could not load messages: ${loadError.message}`;
     else (initial || []).forEach(append);
+    // Mark incoming messages read when the participant opens this conversation.
+    const { error: readError } = await supabase.from('chat_messages').update({ is_read: true }).eq('chat_id', chatId).eq('is_read', false).neq('sender_id', session.user.id);
+    if (readError && !/is_read|column/i.test(readError.message || '')) console.warn('Could not mark messages read:', readError.message);
     const channel = supabase.channel(`chat-${chatId}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `chat_id=eq.${chatId}` }, payload => append(payload.new)).subscribe();
     window.addEventListener('beforeunload', () => supabase.removeChannel(channel));
     form.addEventListener('submit', async event => {
