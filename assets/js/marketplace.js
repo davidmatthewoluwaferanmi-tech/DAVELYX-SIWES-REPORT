@@ -1,34 +1,127 @@
-import { NIGERIA_STATES } from './config.js';
 (function () {
- const categories=['All','Phones & Tablets','Electronics','Fashion','Home & Garden','Vehicles','Property','Services','Jobs','Books & Hobbies','SIWES Materials'];
- const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const price=value=>`₦${Number(value||0).toLocaleString('en-NG')}`;
- let products=[], profiles={}, loadError=null;
- const dateAgo=value=>{const h=Math.max(0,(Date.now()-new Date(value||Date.now()).getTime())/36e5);return h<1?'just now':h<24?`${Math.floor(h)}h ago`:`${Math.floor(h/24)}d ago`;};
- const avatar=(p,name)=>p?.avatar_url?`<img class="seller-avatar" src="${esc(p.avatar_url)}" alt="${esc(name)}">`:`<span class="seller-avatar avatar-fallback">${esc((name||'D').trim().charAt(0).toUpperCase()||'D')}</span>`;
- function locationOptions(select){if(!select)return;const selected=select.value;select.innerHTML='<option value="">All Nigeria</option>'+NIGERIA_STATES.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');if(NIGERIA_STATES.includes(selected))select.value=selected;}
- function render(){
-  const grid=document.getElementById('listing-grid'); if(!grid)return;
-  const category=document.querySelector('.category-chip.active')?.dataset.category||'All';
-  const query=(document.getElementById('search-query')?.value||'').trim().toLowerCase(); const loc=document.getElementById('location-filter')?.value||'';
-  const min=Number(document.getElementById('min-price')?.value||0),max=Number(document.getElementById('max-price')?.value||0);
-  const condition=document.getElementById('condition-filter')?.value||'';
-  const result=products.filter(p=>(category==='All'||p.category===category)&&(!query||`${p.title||''} ${p.description||''}`.toLowerCase().includes(query))&&(!loc||String(p.location||'').toLowerCase().includes(loc.toLowerCase()))&&(!min||Number(p.price)>=min)&&(!max||Number(p.price)<=max)&&(!condition||String(p.condition||'').toLowerCase()===condition.toLowerCase()));
-  grid.innerHTML=result.map(p=>{const owner=profiles[p.seller_id]||{},name=owner.display_name||owner.username||'DAVELYX seller';const images=Array.isArray(p.images)?p.images:[];return `<article class="listing-card"><a href="item.html?id=${encodeURIComponent(p.id)}"><img class="listing-photo" src="${esc(images[0]||'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=80')}" alt="${esc(p.title)}"><div class="listing-card-body"><span class="listing-category">${esc(p.category||'Listing')}</span><h3>${esc(p.title)}</h3><p class="listing-price">${price(p.price)}</p><p class="listing-location">📍 ${esc(p.location||'Nigeria')}</p><span class="listing-seller">${avatar(owner,name)} ${esc(name)} ${owner.display_name&&owner.location?'<b class="verified-badge">✓ Verified</b>':''}</span><small>${dateAgo(p.created_at)}</small></div></a></article>`;}).join('');
-  const count=document.getElementById('result-count');if(count)count.textContent=`${result.length} listings`;
-  const empty=document.getElementById('empty-state');if(empty){empty.hidden=result.length>0;empty.textContent=loadError&&!products.length?'Listings could not be loaded. Please try again later.':products.length?'No listings match those filters. Try changing your search.':'No listings yet, be the first to post!';}
- }
- function renderHome(){const grid=document.getElementById('marketGrid');if(!grid)return;const query=(document.getElementById('marketSearch')?.value||'').toLowerCase(),loc=document.getElementById('marketLocation')?.value||'All Nigeria',cat=document.querySelector('.cat-btn.active')?.dataset.cat||'All';const found=products.filter(p=>(`${p.title||''} ${p.description||''}`.toLowerCase().includes(query))&&(loc==='All Nigeria'||String(p.location||'').toLowerCase().includes(loc.toLowerCase()))&&(cat==='All'||p.category===cat));grid.innerHTML=found.map(p=>`<article class="m-card"><a href="item.html?id=${encodeURIComponent(p.id)}"><img src="${esc(Array.isArray(p.images)&&p.images[0]||'')}" alt="${esc(p.title)}"><strong>${esc(p.title)}</strong><b>${price(p.price)}</b><span>📍 ${esc(p.location||'')}</span></a></article>`).join('');}
- if(document.body.dataset.page==='marketplace'){
-  const bar=document.getElementById('category-bar');if(bar)bar.innerHTML=categories.map(n=>`<button class="category-chip${n==='All'?' active':''}" type="button" data-category="${esc(n)}">${esc(n)}</button>`).join('');
-  const loc=document.getElementById('location-filter'); if(loc)locationOptions(loc);
-  if(loc?.parentElement && !document.getElementById('condition-filter')){const label=document.createElement('label');label.textContent='Condition';label.innerHTML='Condition<select id="condition-filter"><option value="">Any condition</option><option>New</option><option>Used</option></select>';loc.parentElement.after(label);}
-  bar?.addEventListener('click',e=>{const b=e.target.closest('[data-category]');if(!b)return;bar.querySelectorAll('.category-chip').forEach(x=>x.classList.toggle('active',x===b));render();});
-  document.getElementById('market-search')?.addEventListener('submit',e=>{e.preventDefault();render();});
-  ['search-query','location-filter','min-price','max-price','verified-only','condition-filter'].forEach(id=>document.getElementById(id)?.addEventListener('input',render));
-  document.getElementById('clear-filters')?.addEventListener('click',()=>{['search-query','location-filter','min-price','max-price','condition-filter'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});bar?.querySelectorAll('.category-chip').forEach(x=>x.classList.toggle('active',x.dataset.category==='All'));render();});
- }
- if(document.getElementById('marketGrid')){const s=document.getElementById('marketLocation');if(s)locationOptions(s);['marketSearch','marketLocation'].forEach(id=>document.getElementById(id)?.addEventListener('input',renderHome));document.querySelectorAll('.cat-btn').forEach(b=>b.addEventListener('click',()=>setTimeout(renderHome,0)));window.renderMarket=renderHome;window.filterMarket=renderHome;window.filterCat=cat=>{document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));renderHome();};}
- const style=document.createElement('style');style.textContent='.listing-seller{display:flex;align-items:center;gap:6px;font-size:13px}.seller-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover}.verified-badge{background:#e8f5ee;color:#087443;border-radius:12px;padding:2px 6px}.listing-card small{color:#78817c}';document.head.append(style);
- import('./supabase.js').then(async({supabase})=>{let {data,error}=await supabase.from('products').select('*').order('created_at',{ascending:false});if(error){loadError=error;console.error(error);}else products=data||[];const ids=[...new Set(products.map(p=>p.seller_id).filter(Boolean))];if(ids.length){let r=await supabase.from('profiles').select('id,display_name,username,location,avatar_url').in('id',ids);if(r.error&&/avatar_url|column/i.test(r.error.message||''))r=await supabase.from('profiles').select('id,display_name,username,location').in('id',ids);profiles=Object.fromEntries((r.data||[]).map(p=>[p.id,p]));}render();renderHome();}).catch(e=>{loadError=e;render();renderHome();});
+  const categories = ['All', 'Phones & Tablets', 'Electronics', 'Fashion', 'Home & Garden', 'Vehicles', 'Property', 'Services', 'Jobs', 'Books & Hobbies', 'SIWES Materials'];
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[char]));
+  let products = [];
+  let loadError = null;
+
+  const formatPrice = value => `₦${Number(value || 0).toLocaleString('en-NG')}`;
+  const imageUrl = product => Array.isArray(product.images) && product.images[0]
+    ? product.images[0]
+    : 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=80';
+
+  function filteredProducts() {
+    const categoryButton = document.querySelector('.cat-btn.active');
+    const category = categoryButton?.dataset.cat || 'All';
+    const query = (document.getElementById('marketSearch')?.value || document.getElementById('search-query')?.value || '').trim().toLowerCase();
+    const location = document.getElementById('marketLocation')?.value || document.getElementById('location-filter')?.value || '';
+    const min = Number(document.getElementById('min-price')?.value || 0);
+    const max = Number(document.getElementById('max-price')?.value || 0);
+    const verifiedOnly = Boolean(document.getElementById('verified-only')?.checked);
+    return products.filter(product => {
+      const productCategory = product.category || '';
+      const searchable = `${product.title || ''} ${productCategory} ${product.description || ''}`.toLowerCase();
+      const productLocation = String(product.location || '');
+      return (category === 'All' || productCategory === category)
+        && (!query || searchable.includes(query))
+        && (!location || location === 'All Nigeria' || productLocation.toLowerCase().includes(location.toLowerCase()))
+        && (!min || Number(product.price) >= min)
+        && (!max || Number(product.price) <= max)
+        && (!verifiedOnly || Boolean(product.is_verified));
+    });
+  }
+
+  function renderMarketplace() {
+    const grid = document.getElementById('listing-grid');
+    if (!grid) return;
+    const results = filteredProducts();
+    grid.innerHTML = results.map(product => `<article class="listing-card"><a href="item.html?id=${encodeURIComponent(product.id)}"><img class="listing-photo" src="${escapeHtml(imageUrl(product))}" alt="${escapeHtml(product.title)}"><div class="listing-card-body"><span class="listing-category">${escapeHtml(product.category)}</span><h3>${escapeHtml(product.title)}</h3><p class="listing-price">${formatPrice(product.price)}</p><p>${escapeHtml(product.location || '')}</p></div></a></article>`).join('');
+    document.getElementById('result-count').textContent = `${results.length} listings`;
+    const empty = document.getElementById('empty-state');
+    empty.hidden = results.length > 0;
+    empty.textContent = products.length ? 'No listings match those filters. Try changing your search.' : 'No listings yet, be the first to post!';
+    if (loadError && products.length === 0) empty.textContent = 'Listings could not be loaded. Please try again later.';
+  }
+
+  function renderHome() {
+    const grid = document.getElementById('marketGrid');
+    if (!grid) return;
+    const query = (document.getElementById('marketSearch')?.value || '').trim().toLowerCase();
+    const location = document.getElementById('marketLocation')?.value || 'All Nigeria';
+    const activeCategory = document.querySelector('.cat-btn.active')?.dataset.cat || 'All';
+    const results = products.filter(product => {
+      const searchable = `${product.title || ''} ${product.category || ''} ${product.description || ''}`.toLowerCase();
+      return (!query || searchable.includes(query))
+        && (location === 'All Nigeria' || String(product.location || '').toLowerCase().includes(location.toLowerCase()) || product.location === 'Any Location')
+        && (activeCategory === 'All' || product.category === activeCategory);
+    });
+    grid.innerHTML = results.map(product => `<article class="m-card" role="link" tabindex="0" onclick="location.href='item.html?id=${encodeURIComponent(product.id)}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();location.href='item.html?id=${encodeURIComponent(product.id)}'}"><div class="m-img">${Array.isArray(product.images) && product.images[0] ? `<img src="${escapeHtml(product.images[0])}" alt="${escapeHtml(product.title)}">` : '🛍️'}</div><div class="m-body"><div class="m-price">${formatPrice(product.price)}</div><div class="m-title">${escapeHtml(product.title)}</div><div class="m-meta"><span>${escapeHtml(product.location || '')}</span></div></div></article>`).join('');
+    const empty = document.getElementById('market-empty-state');
+    if (empty) {
+      empty.hidden = results.length > 0;
+      empty.textContent = products.length ? 'No listings match your search.' : 'No listings yet, be the first to post!';
+    } else if (!results.length) {
+      grid.innerHTML = '<p class="market-empty-state">No listings yet, be the first to post!</p>';
+    }
+  }
+
+  // The homepage has legacy inline demo rendering. Replace its renderer so no demo IDs
+  // (such as m103) are ever emitted as links on the live site.
+  if (document.getElementById('marketGrid')) window.renderMarket = renderHome;
+  if (document.body.dataset.page === 'marketplace') {
+    const bar = document.getElementById('category-bar');
+    bar.innerHTML = categories.map(name => `<button class="category-chip${name === 'All' ? ' active' : ''}" type="button" data-category="${escapeHtml(name)}">${escapeHtml(name)}</button>`).join('');
+    bar.addEventListener('click', event => {
+      const button = event.target.closest('[data-category]');
+      if (!button) return;
+      bar.querySelectorAll('.category-chip').forEach(chip => chip.classList.toggle('active', chip === button));
+      document.getElementById('results-title').textContent = button.dataset.category === 'All' ? 'All listings' : button.dataset.category;
+      renderMarketplace();
+    });
+    document.getElementById('market-search').addEventListener('submit', event => { event.preventDefault(); renderMarketplace(); });
+    ['search-query', 'location-filter', 'min-price', 'max-price', 'verified-only'].forEach(id => document.getElementById(id).addEventListener('input', renderMarketplace));
+    document.getElementById('clear-filters').addEventListener('click', () => {
+      ['search-query', 'location-filter', 'min-price', 'max-price'].forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('verified-only').checked = false;
+      bar.querySelectorAll('.category-chip').forEach(chip => chip.classList.toggle('active', chip.dataset.category === 'All'));
+      document.getElementById('results-title').textContent = 'All listings';
+      renderMarketplace();
+    });
+  }
+
+  if (document.getElementById('marketGrid')) {
+    document.querySelectorAll('.cat-btn').forEach(button => button.addEventListener('click', () => setTimeout(renderHome, 0)));
+    ['marketSearch', 'marketLocation'].forEach(id => document.getElementById(id)?.addEventListener('input', renderHome));
+    window.renderMarket = renderHome;
+  }
+  window.filterCat = category => {
+    document.querySelectorAll('.cat-btn').forEach(button => button.classList.toggle('active', button.dataset.cat === category));
+    renderHome();
+  };
+  window.filterMarket = renderHome;
+
+  import('./supabase.js').then(async ({ supabase }) => {
+    const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+    if (error) {
+      loadError = error;
+      console.error('Marketplace product fetch failed:', error);
+    } else {
+      products = data || [];
+    }
+    renderMarketplace();
+    renderHome();
+  }).catch(error => {
+    loadError = error;
+    console.error('Could not initialize Supabase marketplace:', error);
+    renderMarketplace();
+    renderHome();
+  });
+
+  window.Tawk_API = window.Tawk_API || {};
+  window.Tawk_LoadStart = new Date();
+  const tawk = document.createElement('script');
+  tawk.async = true;
+  tawk.src = 'https://embed.tawk.to/6afbb430c812c53cc041b184/1k7jjfo2t';
+  tawk.charset = 'UTF-8';
+  tawk.setAttribute('crossorigin', '*');
+  document.head.appendChild(tawk);
 })();
