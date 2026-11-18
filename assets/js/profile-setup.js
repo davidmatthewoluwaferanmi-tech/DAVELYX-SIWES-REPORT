@@ -26,23 +26,24 @@ form.addEventListener('submit', async event => {
   button.disabled = true;
   status.textContent = 'Saving profile…';
   try {
-    let avatarUrl = null;
+    let avatarUrl;
     const file = form.elements.avatar.files[0];
     if (file) {
       if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) throw new Error('Choose an image smaller than 5 MB.');
-      const path = `${current.user.id}/avatars/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-      const { error: uploadError } = await supabase.storage.from('product-images').upload(path, file, { upsert: false, contentType: file.type });
+      const path = `${current.user.id}/avatar.jpg`;
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
       if (uploadError) throw new Error(`Avatar upload failed: ${uploadError.message}`);
-      avatarUrl = supabase.storage.from('product-images').getPublicUrl(path).data.publicUrl;
+      avatarUrl = supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl;
     }
-    const { error } = await supabase.from('profiles').upsert({
+    const profile = {
       id: current.user.id,
       display_name: form.elements.display_name.value.trim(),
       location: form.elements.location.value,
       whatsapp: form.elements.whatsapp.value.trim(),
-      avatar_url: avatarUrl,
       created_at: new Date().toISOString()
-    }, { onConflict: 'id' });
+    };
+    if (avatarUrl) profile.avatar_url = avatarUrl;
+    const { error } = await supabase.from('profiles').upsert(profile, { onConflict: 'id' });
     if (error) {
       const missingTable = error.code === 'PGRST205' || /relation .*profiles.* does not exist/i.test(error.message || '');
       throw new Error(missingTable ? 'The profiles table is not available yet. Run supabase-launch-schema.sql in the Supabase SQL Editor, then try again.' : error.message);
