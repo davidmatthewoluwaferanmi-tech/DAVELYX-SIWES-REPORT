@@ -51,6 +51,35 @@
       sellLink.style.cssText = 'background:#ff6a00;color:white;padding:8px 16px;border-radius:20px;font-weight:800';
       nav.appendChild(sellLink);
     }
+    if (!nav.querySelector('a[href="/messages.html"]')) {
+      const messagesLink = document.createElement('a');
+      messagesLink.href = '/messages.html';
+      messagesLink.className = 'header-btn';
+      messagesLink.innerHTML = '💬 <span>Messages</span> <span id="unread-badge" hidden></span>';
+      const sellLink = nav.querySelector('a[href="sell.html"]');
+      if (sellLink) nav.insertBefore(messagesLink, sellLink);
+      else nav.appendChild(messagesLink);
+
+      import('./supabase.js').then(async ({ supabase }) => {
+        const badge = messagesLink.querySelector('#unread-badge');
+        try {
+          const { data: { user }, error: authError } = await supabase.auth.getUser();
+          if (authError || !user) return;
+          const { count, error } = await supabase.from('chat_messages')
+            .select('id', { count: 'exact', head: true })
+            .eq('recipient_id', user.id)
+            .eq('is_read', false);
+          if (error) throw error;
+          if (count > 0) {
+            badge.textContent = String(count);
+            badge.hidden = false;
+          }
+        } catch (error) {
+          badge.hidden = true;
+          console.warn('Unread message count unavailable:', error.message || error);
+        }
+      }).catch(() => { badge.hidden = true; });
+    }
   }
   const heroActions = document.querySelector('.hero-actions');
   if (heroActions && !heroActions.querySelector('a[href="marketplace.html"]')) {
