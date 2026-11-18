@@ -2,18 +2,37 @@ import { supabase } from './supabase.js';
 const params = new URLSearchParams(location.search), chatId = params.get('chat_id');
 const status = document.getElementById('chat-status'), chatList = document.getElementById('chat-list');
 const view = document.getElementById('conversation-view'), messages = document.getElementById('messages'), form = document.getElementById('message-form');
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const { data: { session }, error: authError } = await supabase.auth.getSession();
 if (authError || !session) {
   status.textContent = 'Log in to view your messages.';
   chatList.innerHTML = `<a href="login.html?next=${encodeURIComponent(location.pathname + location.search)}">Log in</a>`;
   form.hidden = true;
 } else if (!chatId) {
-  const { data: chats, error } = await supabase.from('chats').select('id,product_id,buyer_id,seller_id,last_message,updated_at,products(title)').or(`buyer_id.eq.${session.user.id},seller_id.eq.${session.user.id}`).order('updated_at', { ascending: false });
+  // Chats are the canonical conversation index. Include chats where this user is
+  // either the buyer or seller, then fetch the latest actual message per chat.
+  const { data: chats, error } = await supabase.from('chats')
+    .select('id,product_id,buyer_id,seller_id,last_message,updated_at,products(title,images)')
+    .or(`buyer_id.eq.${session.user.id},seller_id.eq.${session.user.id}`)
+    .order('updated_at', { ascending: false });
   if (error) status.textContent = `Could not load messages: ${error.message}`;
   else if (!chats?.length) status.textContent = 'No messages yet. Browse listings and start a chat with a seller.';
   else {
+    const { data: messageRows, error: messageError } = await supabase.from('chat_messages')
+      .select('id,chat_id,sender_id,content,created_at')
+      .in('chat_id', chats.map(chat => chat.id))
+      .order('created_at', { ascending: false });
+    if (messageError) console.warn('Could not load latest chat messages:', messageError.message);
+    const latestByChat = new Map();
+    for (const message of messageRows || []) if (!latestByChat.has(message.chat_id)) latestByChat.set(message.chat_id, message);
     status.textContent = '';
-    chatList.innerHTML = chats.map(chat => `<a class="chat-list-item" style="display:block;padding:14px;margin:10px 0;background:#fff;border-radius:10px;color:#111827" href="chat.html?chat_id=${encodeURIComponent(chat.id)}&product_id=${encodeURIComponent(chat.product_id)}"><strong>${String(chat.products?.title || 'Listing').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</strong><br>${String(chat.last_message || 'Start the conversation').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</a>`).join('');
+    chatList.innerHTML = chats.map(chat => {
+      const message = latestByChat.get(chat.id);
+      const preview = message ? `${message.sender_id === session.user.id ? 'You: ' : ''}${message.content}` : (chat.last_message || 'Start the conversation');
+      const title = chat.products?.title || 'Listing';
+      const image = Array.isArray(chat.products?.images) ? chat.products.images[0] : '';
+      return `<a class="chat-list-item" style="display:block;padding:14px;margin:10px 0;background:#fff;border-radius:10px;color:#111827" href="chat.html?chat_id=${encodeURIComponent(chat.id)}&product_id=${encodeURIComponent(chat.product_id)}">${image ? `<img src="${escapeHtml(image)}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:8px;float:right">` : ''}<strong>${escapeHtml(title)}</strong><br><span>${escapeHtml(preview)}</span></a>`;
+    }).join('');
   }
   form.hidden = true;
   view.hidden = true;
@@ -40,12 +59,14 @@ if (authError || !session) {
       const input = document.getElementById('message-text'), content = input.value.trim();
       if (!content) return;
       const send = form.querySelector('button'); send.disabled = true;
-      const { error: sendError } = await supabase.from('chat_messages').insert({ chat_id: chatId, sender_id: session.user.id, content });
-      send.disabled = false;
-      if (sendError) { status.textContent = `Message failed: ${sendError.message}`; return; }
-      const { error: updateError } = await supabase.from('chats').update({ last_message: content, updated_at: new Date().toISOString() }).eq('id', chatId);
-      if (updateError) status.textContent = `Message sent, but chat preview could not be updated: ${updateError.message}`;
-      input.value = '';
+      try {
+        const { error: sendError } = await supabase.from('chat_messages').insert({ chat_id: chatId, sender_id: session.user.id, content });
+        if (sendError) throw sendError;
+        const { error: updateError } = await supabase.from('chats').update({ last_message: content, updated_at: new Date().toISOString() }).eq('id', chatId);
+        if (updateError && !/updated_at|column/i.test(updateError.message || '')) throw updateError;
+        input.value = ''; status.textContent = '';
+      } catch (sendError) { status.textContent = `Message failed: ${sendError.message}`; }
+      finally { send.disabled = false; }
     });
   }
 }
