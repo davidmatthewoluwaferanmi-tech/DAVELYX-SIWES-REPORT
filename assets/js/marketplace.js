@@ -1,5 +1,6 @@
 (function () {
   const categories = ['All', 'Phones & Tablets', 'Electronics', 'Fashion', 'Home & Garden', 'Vehicles', 'Property', 'Services', 'Jobs', 'Books & Hobbies', 'SIWES Materials'];
+  const states = ['All Nigeria', 'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno', 'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT - Abuja', 'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara', 'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'];
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[char]));
   let products = [];
   let loadError = null;
@@ -8,6 +9,19 @@
   const imageUrl = product => Array.isArray(product.images) && product.images[0]
     ? product.images[0]
     : 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=80';
+
+  // Keep the existing location filters; only expand their options to all states and FCT.
+  ['marketLocation', 'location-filter'].forEach(id => {
+    const select = document.getElementById(id);
+    if (!select) return;
+    const selected = select.value;
+    const allValue = id === 'marketLocation' ? 'All Nigeria' : '';
+    select.innerHTML = states.map((state, index) => {
+      const value = index === 0 ? allValue : state;
+      return `<option value="${escapeHtml(value)}">${escapeHtml(state)}</option>`;
+    }).join('');
+    if (states.some((state, index) => (index === 0 ? allValue : state) === selected)) select.value = selected;
+  });
 
   function filteredProducts() {
     const categoryButton = document.querySelector('.cat-btn.active');
