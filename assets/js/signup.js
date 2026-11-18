@@ -5,12 +5,12 @@ const status = document.getElementById('auth-status');
 const params = new URLSearchParams(window.location.search);
 
 function safeRedirect(value) {
-  if (!value) return 'marketplace.html';
+  if (!value) return '';
   try {
     const target = new URL(value, window.location.origin);
     if (target.origin === window.location.origin) return target.href;
   } catch (_) {}
-  return 'marketplace.html';
+  return '';
 }
 
 form.addEventListener('submit', async event => {
@@ -31,5 +31,8 @@ form.addEventListener('submit', async event => {
     status.textContent = 'Account created. Check your email if confirmation is enabled, then sign in with your password.';
     return;
   }
-  window.location.assign(safeRedirect(params.get('redirect')));
+  const redirectUrl = safeRedirect(params.get('redirect'));
+  const profileUrl = new URL('profile.html', window.location.href);
+  if (redirectUrl) profileUrl.searchParams.set('redirect', redirectUrl);
+  window.location.href = profileUrl.href;
 });
