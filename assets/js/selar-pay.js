@@ -1,35 +1,25 @@
 (function () {
-  const selarLinks = {
-    logbook: 'https://selar.com/5933256r73',
-    technical: 'https://selar.com/zbb90t91x4',
-    bundle: 'https://selar.com/hb979as992'
+  const links = { logbook: 'https://selar.com/placeholder', report: 'https://selar.com/placeholder', bundle: 'https://selar.com/placeholder' };
+  fetch('/api/selar-links').then(r => r.ok ? r.json() : Promise.reject()).then(data => Object.assign(links, data)).catch(() => {});
+  const button = document.getElementById('selarPayBtn');
+  if (!button) return;
+  const radios = [...document.querySelectorAll('input[name="package"]')];
+  const packageKey = value => {
+    const v = String(value || '').toLowerCase();
+    if (v.includes('logbook') || v.includes('3,000')) return 'logbook';
+    if (v.includes('report') || v.includes('5,000') || v.includes('technical')) return 'report';
+    return 'bundle';
   };
-  const payButton = document.getElementById('selarPayBtn');
-  if (!payButton) return;
-  const radios = document.querySelectorAll('input[name="package"]');
-
-  const linkFor = (pkg) => {
-    const value = pkg.toLowerCase();
-    if (value.includes('3,000') || value.includes('logbook only')) return selarLinks.logbook;
-    if (value.includes('8,000') || (value.includes('technical') && !value.includes('both'))) return selarLinks.technical;
-    return selarLinks.bundle;
-  };
-  const updatePayButton = () => {
+  const update = () => {
     const selected = document.querySelector('input[name="package"]:checked');
     if (!selected) return;
-    payButton.href = linkFor(selected.value);
-    payButton.textContent = selected.value.includes('3,000')
-      ? 'Pay ₦3,000 - Secure via Selar 🔥'
-      : selected.value.includes('8,000')
-        ? 'Pay ₦8,000 - Secure via Selar 🔥'
-        : 'Pay ₦10,000 - BESTSELLER 🔥';
+    const key = packageKey(selected.value);
+    button.href = links[key];
+    button.textContent = key === 'logbook' ? 'Pay ₦3,000 - Secure via Selar 🔥' : key === 'report' ? 'Pay ₦5,000 - Secure via Selar 🔥' : 'Pay ₦8,000 - BESTSELLER 🔥';
   };
-
-  payButton.href = selarLinks.bundle;
-  payButton.target = '_blank';
-  radios.forEach((radio) => radio.addEventListener('change', updatePayButton));
-  updatePayButton();
-  payButton.addEventListener('click', (event) => {
+  radios.forEach(radio => radio.addEventListener('change', update));
+  update();
+  button.addEventListener('click', event => {
     const app = window.DavelyxApp;
     const details = app && app.validOrder();
     if (!details) {
@@ -38,12 +28,8 @@
       return;
     }
     try { localStorage.setItem('davelyx_last_order', JSON.stringify(details)); }
-    catch (_) {
-      event.preventDefault();
-      app.formStatus.textContent = 'Could not save your order. Please enable browser storage and try again.';
-      return;
-    }
-    payButton.href = linkFor(details.package);
+    catch (_) { event.preventDefault(); if (app) app.formStatus.textContent = 'Could not save your order. Please enable browser storage and try again.'; return; }
+    button.href = links[packageKey(details.package)];
     if (app) app.formStatus.textContent = 'Opening Selar securely. After payment, you will return here to confirm on WhatsApp.';
   });
 })();

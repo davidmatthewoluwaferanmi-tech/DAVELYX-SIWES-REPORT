@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0D221B">
+  <title>SIWES Report Generator | DAVELYX</title>
+  <link rel="stylesheet" href="assets/css/style.css"><link rel="stylesheet" href="assets/css/marketplace.css">
+</head>
+<body>
+  <header class="site-header"><nav class="nav container"><a class="brand" href="index.html"><span class="brand-mark">D</span><span>DAVELYX<small>SIWES PLUG</small></span></a><div class="nav-links"><a href="index.html">Home</a><a href="index.html#order">Place Your Order</a></div></nav></header>
+  <main class="market-container" style="max-width:900px">
+    <header class="section-heading"><span class="eyebrow">DAVELYX SIWES support</span><h1>Prepare your SIWES document</h1><p>Choose a package, provide your details and work activities, then continue to Selar.</p></header>
+    <form id="siwes-form" class="sell-form">
+      <h2>Your details</h2>
+      <label>Full Name<input name="full_name" autocomplete="name" required></label>
+      <label>Matric No<input name="matric_no" required></label>
+      <label>Department<input name="department" required></label>
+      <label>Faculty<input name="faculty" required></label>
+      <label>Institution Name<input name="institution_name" required></label>
+      <label>Institution Location<input name="institution_location" required></label>
+      <label>Country<input name="country" value="Nigeria" required></label>
+      <label>Level<input name="level" required></label>
+      <label>Training Type<select name="training_type" required><option value="">Select training type</option><option>SIWES</option><option>IT</option><option>Internship</option></select></label>
+      <label>Company Name<input name="company_name" required></label>
+      <label>Company Location<input name="company_location" required></label>
+      <label>Company Department<input name="company_department" required></label>
+      <label>Supervisor Name<input name="supervisor_name" required></label>
+      <label>Start Date<input name="start_date" type="date" required></label>
+      <label>End Date<input name="end_date" type="date" required></label>
+      <label>Duration<input name="duration" required></label>
+      <label>WhatsApp Number<input name="whatsapp_number" type="tel" autocomplete="tel" required></label>
+      <fieldset><legend>Choose a package</legend>
+        <label><input type="radio" name="package" value="logbook_only" required> Logbook Only ₦3,000</label>
+        <label><input type="radio" name="package" value="report_only" required> Report Only ₦5,000</label>
+        <label><input type="radio" name="package" value="bundle" required> Bundle ₦8,000 — BESTSELLER</label>
+      </fieldset>
+      <label>Paste your daily/weekly activities<textarea name="logbook" rows="10" required placeholder="Paste your daily/weekly activities"></textarea></label>
+      <label>Custom Note / Lecturer Instruction<textarea name="custom_note" rows="7" placeholder="Paste your lecturer format here, e.g. My lecturer wants 5 chapters, use APA..."></textarea></label>
+      <p id="siwes-status" role="status" aria-live="polite"></p>
+      <a id="siwes-pay" class="btn btn-gold" href="https://selar.com/placeholder" target="_blank" rel="noopener noreferrer">Continue to Selar</a>
+      <button id="siwes-confirm-payment" class="btn" type="button" disabled>I have paid — Generate document</button>
+    </form>
+    <section id="siwes-result" hidden><h2>Your generated document</h2><pre id="siwes-document" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre><button id="download-pdf" class="btn btn-gold" type="button">Download PDF</button><button id="copy-document" class="btn" type="button">Copy</button></section>
+  </main>
+  <footer class="footer"><div class="container"><a href="index.html">DAVELYX SIWES PLUG</a> · <a href="index.html#marketplace-section">Marketplace</a></div></footer>
+  <script src="assets/js/siwes-generator.js"></script>
+</body>
+</html>
